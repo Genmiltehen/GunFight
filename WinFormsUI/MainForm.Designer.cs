@@ -30,7 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             MainGLControl = new OpenTK.GLControl.GLControl();
-            timer1 = new System.Windows.Forms.Timer(components);
+            MainTimer = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // MainGLControl
@@ -47,11 +47,12 @@
             MainGLControl.Size = new Size(800, 450);
             MainGLControl.TabIndex = 0;
             MainGLControl.Load += OnGLLoad;
+            MainGLControl.Paint += OnGLPaint;
             // 
-            // timer1
+            // MainTimer
             // 
-            timer1.Interval = 1;
-            timer1.Tick += TimerTick;
+            MainTimer.Interval = 1;
+            MainTimer.Tick += TimerTick;
             // 
             // MainForm
             // 
@@ -61,12 +62,14 @@
             Controls.Add(MainGLControl);
             Name = "MainForm";
             Text = "Form1";
+            Load += MainFormLoad;
+            Resize += MainFormResize;
             ResumeLayout(false);
         }
 
         #endregion
 
         private OpenTK.GLControl.GLControl MainGLControl;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer MainTimer;
     }
 }

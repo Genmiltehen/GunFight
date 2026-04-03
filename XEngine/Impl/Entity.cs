@@ -9,8 +9,10 @@ namespace GameEngineLib.Impl
 {
     public class Entity
     {
+        public required string Name { get; set; }
         private readonly Dictionary<Type, GameComponent> _components = [];
-        public Entity() { }
+
+        internal Entity() { }
 
         public T AddComponent<T>() where T : GameComponent, new()
         {

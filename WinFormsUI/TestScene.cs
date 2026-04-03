@@ -1,6 +1,8 @@
 ﻿using GameEngineLib.Defaults;
+using GameEngineLib.Defaults.Render;
 using GameEngineLib.Impl;
 using GameEngineLib.Impl.SceneImpl;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,14 +20,9 @@ namespace WinFormsUI
 
         public override void Load()
         {
-            var entity = new Entity(
-                new SpriteComp(AssetsLoader.LoadTexture("Test/test.png")),
-                new TransformComp()
-            );
-
-            AddEntity(entity);
-
-
+            var entity = CreateEntity("player");
+            entity.AddComponent<TransformComp>().Init(new Vector3(100, 100, 0), 0.5f, new Vector2(0.2f, 0.2f));
+            entity.AddComponent<SpriteComp>().Init(AssetsLoader.LoadTexture("Test/test.jpg"));
         }
     }
 }

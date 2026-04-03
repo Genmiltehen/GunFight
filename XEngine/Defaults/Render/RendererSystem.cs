@@ -27,7 +27,6 @@ namespace GameEngineLib.Defaults.Render
             float halfW = _screenWidth / 2f;
             float halfH = _screenHeight / 2f;
             _projection = Matrix4.CreateOrthographicOffCenter(-halfW, halfW, -halfH, halfH, -1f, 1f);
-            GL.Viewport(0, 0, width, height);
         }
 
         public void Render(Scene scene, CameraComp camera)

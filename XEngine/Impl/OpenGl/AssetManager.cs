@@ -2,6 +2,7 @@
 using GameEngineLib.Impl.SceneImpl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -52,14 +53,14 @@ namespace GameEngineLib.Impl.OpenGl
         {
             if (_shaders.TryGetValue(name, out var shader)) return shader;
 
-            Console.WriteLine($"[Error] Shader '{name}' not found! Falling back to ErrorShader.");
+            Debug.WriteLine($"[Error] Shader '{name}' not found! Falling back to ErrorShader.");
             return _shaders.GetValueOrDefault("Error")
                    ?? throw new Exception("Critical: ErrorShader is missing from AssetManager!");
         }
 
         public Texture2D LoadTexture(string relativePath, bool isPersistent = false)
         {
-            string fullPath = Path.GetFullPath(Path.Combine(_rootPath, relativePath));
+            string fullPath = Path.GetFullPath(Path.Combine(_rootPath, "Textures" ,relativePath));
             var targetDict = isPersistent ? _persistentTextures : _sceneTextures;
 
             if (_persistentTextures.TryGetValue(fullPath, out var pTex)) return pTex;
@@ -67,7 +68,7 @@ namespace GameEngineLib.Impl.OpenGl
 
             if (!File.Exists(fullPath))
             {
-                Console.WriteLine($"[Error] Missing texture: {fullPath}");
+                Debug.WriteLine($"[Error] Missing texture: {fullPath}");
                 return _persistentTextures["Default_Error"];
             }
 

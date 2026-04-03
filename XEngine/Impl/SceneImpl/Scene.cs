@@ -13,8 +13,13 @@ namespace GameEngineLib.Impl.SceneImpl
         {
             AssetsLoader = assetsLoader;
         }
+        public Entity CreateEntity(string name)
+        {
+            var _e = new Entity() { Name = name };
+            _entities.Add(_e);
+            return _e;
+        }
 
-        public void AddEntity(Entity entity) => _entities.Add(entity);
         public void AddSystem(IGameSystem system)
         {
             _systems.Add(system);

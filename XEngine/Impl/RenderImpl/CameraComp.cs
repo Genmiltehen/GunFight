@@ -11,11 +11,14 @@ namespace GameEngineLib.Impl.RenderImpl
 {
     public sealed class CameraComp : GameComponent
     {
+        public int Priority { get; private set; }
         public RenderPipeline _renderer;
 
-        public CameraComp Init(RenderPipeline renderer)
+        public CameraComp Init(RenderPipeline renderer, int priority)
         {
             _renderer = renderer;
+            Priority = priority;
+            _renderer.RegisterCamera(this);
             return this;
         }
 

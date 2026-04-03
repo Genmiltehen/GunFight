@@ -22,23 +22,36 @@ namespace WinFormsUI
         public MainForm()
         {
             InitializeComponent();
+            _engine = new GameEngine();
+        }
 
-            ClientSize = new Size(1280, 720);
+        private void MainFormLoad(object sender, EventArgs e)
+        {
+            int width = ClientSize.Width;
+            int height = ClientSize.Height;
+            _engine.Renderer.SetViewport(width, height);
 
-            _engine = new GameEngine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight\\Assets");
+
+            _engine.SceneManager.SwitchTo(new TestScene(_engine.Assets));
+            _engine.AddCamera();
+
+            _stopwatch.Start();
+            MainTimer.Start();
         }
 
         private void OnGLLoad(object sender, EventArgs e)
         {
-            GL.ClearColor(Color.White);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+            GL.ClearColor(Color.Black);
+
+            _engine.Init("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight\\Assets");
         }
 
         private void OnGLPaint(object sender, PaintEventArgs e)
         {
             MainGLControl.MakeCurrent();
-            
             _engine.Render();
-
             MainGLControl.SwapBuffers();
         }
 
@@ -56,6 +69,16 @@ namespace WinFormsUI
             }
 
             MainGLControl.Invalidate();
+        }
+
+        private void MainFormResize(object sender, EventArgs e)
+        {
+            base.OnResize(e);
+
+            int width = ClientSize.Width;
+            int height = ClientSize.Height;
+
+            if (width > 0 && height > 0) _engine.Renderer.SetViewport(width, height);
         }
     }
 }
