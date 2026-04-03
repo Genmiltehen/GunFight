@@ -1,11 +1,13 @@
-﻿namespace GameEngineLib.Impl.SceneImpl
+﻿using GameEngineLib.Impl.RenderImpl;
+
+namespace GameEngineLib.Impl.SceneImpl
 {
     public class Scene
     {
         protected readonly IAssetLoader AssetsLoader;
 
         private readonly List<Entity> _entities = [];
-        private readonly List<IGameSystem> _processors = [];
+        private readonly List<IGameSystem> _systems = [];
 
         protected Scene(IAssetLoader assetsLoader)
         {
@@ -15,16 +17,18 @@
         public void AddEntity(Entity entity) => _entities.Add(entity);
         public void AddSystem(IGameSystem system)
         {
-            _processors.Add(system);
-            _processors.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+            _systems.Add(system);
+            _systems.Sort((a, b) => a.Priority.CompareTo(b.Priority));
         }
+
+        // TODO: add removers
 
         public virtual void Load() { }
         public virtual void Unload() { }
 
         public void Update(float _dt)
         {
-            foreach (var _p in _processors) _p.Update(this, _dt);
+            foreach (var _p in _systems) _p.Update(this, _dt);
         }
 
         // --- Queries ---
@@ -33,9 +37,8 @@
         {
             foreach (var entity in _entities) if (_predicate(entity)) yield return entity;
         }
-
         public IEnumerable<(Entity, T1)> Query<T1>(Predicate<Entity>? _predicate = null)
-            where T1 : IGameComponent
+            where T1 : GameComponent
         {
             foreach (var entity in _entities)
             {
@@ -46,10 +49,9 @@
                 }
             }
         }
-
         public IEnumerable<(Entity, T1, T2)> Query<T1, T2>(Predicate<Entity>? _predicate = null)
-            where T1 : IGameComponent
-            where T2 : IGameComponent
+            where T1 : GameComponent
+            where T2 : GameComponent
         {
             foreach (var entity in _entities)
             {
@@ -61,11 +63,10 @@
                 }
             }
         }
-
         public IEnumerable<(Entity, T1, T2, T3)> Query<T1, T2, T3>(Predicate<Entity>? _predicate = null)
-            where T1 : IGameComponent
-            where T2 : IGameComponent
-            where T3 : IGameComponent
+            where T1 : GameComponent
+            where T2 : GameComponent
+            where T3 : GameComponent
         {
             foreach (var _e in _entities)
             {

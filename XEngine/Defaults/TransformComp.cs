@@ -8,14 +8,22 @@ using System.Threading.Tasks;
 
 namespace GameEngineLib.Defaults
 {
-    public class TransformComp : IGameComponent
+    public sealed class TransformComp : GameComponent
     {
-        private Vector3 _position;
-        private float _rotation;
+        private Vector3 _position = Vector3.Zero;
+        private float _rotation = 0;
         private Vector2 _scale = Vector2.One;
 
         private Matrix4 _cachedMatrix;
         private bool _isDirty = true;
+
+        public TransformComp Init(Vector3 pos,  float rotation, Vector2 scale)
+        {
+            _position = pos;
+            _rotation = rotation;
+            _scale = scale;
+            return this;
+        }
 
         public Vector3 Position
         {

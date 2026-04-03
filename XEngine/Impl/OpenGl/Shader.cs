@@ -12,6 +12,18 @@ namespace GameEngineLib.Impl.OpenGl
 
         private static int _currentBoundHandle = -1;    // видно всем чтобы не менять handle когда не надо
 
+        /// <summary>
+        /// Initializes Shader from folder, wich must contain shader_vert.glsl and shader_frag.glsl
+        /// </summary>
+        /// <param name="folderPath">folder to shader sources</param>
+        /// <returns></returns>
+        public static Shader FromFolder(string folderPath)
+        {
+            var _vertexPath = Path.Combine(folderPath, "shader_vert.glsl");
+            var _fragentPath = Path.Combine(folderPath, "shader_frag.glsl");
+            return new Shader(File.ReadAllText(_vertexPath), File.ReadAllText(_fragentPath));
+        }
+
         public static Shader FromFiles(string vPath, string fPath)
         {
             return new Shader(File.ReadAllText(vPath), File.ReadAllText(fPath));
@@ -96,7 +108,7 @@ namespace GameEngineLib.Impl.OpenGl
         {
             if (_uniformLocations.TryGetValue(name, out int location))
                 return location;
-            
+
             location = GL.GetUniformLocation(Handle, name);
             _uniformLocations[name] = location;
             return location;

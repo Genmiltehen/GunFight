@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             MainGLControl = new OpenTK.GLControl.GLControl();
+            timer1 = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // MainGLControl
@@ -44,6 +46,12 @@
             MainGLControl.SharedContext = null;
             MainGLControl.Size = new Size(800, 450);
             MainGLControl.TabIndex = 0;
+            MainGLControl.Load += OnGLLoad;
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1;
+            timer1.Tick += TimerTick;
             // 
             // MainForm
             // 
@@ -59,5 +67,6 @@
         #endregion
 
         private OpenTK.GLControl.GLControl MainGLControl;
+        private System.Windows.Forms.Timer timer1;
     }
 }

@@ -9,19 +9,18 @@ namespace GameEngineLib.Impl
 {
     public class Entity
     {
-        private readonly Dictionary<Type, IGameComponent> _components = [];
-        public Entity(params IGameComponent[] Components)
+        private readonly Dictionary<Type, GameComponent> _components = [];
+        public Entity() { }
+
+        public T AddComponent<T>() where T : GameComponent, new()
         {
-            foreach (var component in Components)
-            {
-                _components.Add(component.GetType(), component);
-            }
+            T component = new() { Owner = this };
+            _components[typeof(T)] = component;
+            return component;
         }
 
-        public void AddComponent<T>(T _comp) where T : IGameComponent => _components.Add(typeof(T), _comp);
+        public bool Has<T>() where T : GameComponent => _components.ContainsKey(typeof(T));
 
-        public bool Has<T>() where T : IGameComponent => _components.ContainsKey(typeof(T));
-
-        public T? Get<T>() where T : IGameComponent => _components.TryGetValue(typeof(T), out var c) ? (T)c : default;
+        public T? Get<T>() where T : GameComponent => _components.TryGetValue(typeof(T), out var c) ? (T)c : default;
     }
 }

@@ -21,18 +21,31 @@ namespace GameEngineLib.Impl.OpenGl
 
         public AssetManager(string AssetPath)
         {
-            _rootPath = Path.Combine(AssetPath);
+            _rootPath = Path.GetFullPath(AssetPath);
 
             UnitQuad = new UnitQuad();
-            _shaders["Sprite"] = Shader.FromFiles("sprite.vert", "sprite.frag");
 
-            InitializeErrorShader();
-            InitializeDefaultTexture();
+            InitDefaultSpriteShader();
+            InitErrorShader();
+            InitDefaultTexture();
         }
 
-        private void InitializeDefaultTexture()
+        private void InitDefaultTexture()
         {
-            _persistentTextures["Default_Error"] = Texture2D.FromPath("Textures/Error.png");
+            var path = Path.Combine(_rootPath, "Textures", "Error.png");
+            _persistentTextures["Default_Error"] = Texture2D.FromPath(path);
+        }
+
+        private void InitErrorShader()
+        {
+            var _shaderPath = Path.Combine(_rootPath, "Shaders", "Error");
+            _shaders["Error"] = Shader.FromFolder(_shaderPath);
+        }
+
+        private void InitDefaultSpriteShader()
+        {
+            var _shaderPath = Path.Combine(_rootPath, "Shaders", "Default");
+            _shaders["Sprite"] = Shader.FromFolder(_shaderPath);
         }
 
         public Shader GetShader(string name)
@@ -67,23 +80,6 @@ namespace GameEngineLib.Impl.OpenGl
         {
             foreach (var tex in _sceneTextures.Values) tex.Dispose();
             _sceneTextures.Clear();
-        }
-
-        private void InitializeErrorShader()
-        {
-            const string vert = @"
-        #version 330 core
-        layout (location = 0) in vec2 aPos;
-        uniform mat4 uModel;
-        uniform mat4 uProjection;
-        void main() { gl_Position = uProjection * uModel * vec4(aPos, 0.0, 1.0); }";
-
-            const string frag = @"
-        #version 330 core
-        out vec4 FragColor;
-        void main() { FragColor = vec4(1.0, 0.0, 1.0, 1.0); }";
-
-            _shaders["Error"] = Shader.FromSource(vert, frag);
         }
 
         public void Dispose()
