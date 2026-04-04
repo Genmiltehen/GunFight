@@ -1,8 +1,8 @@
-﻿using GameEngineLib.Impl;
-using GameEngineLib.Impl.OpenGl;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
+using XEngine.Core.Base;
+using XEngine.Core.Graphics.OpenGL;
 
-namespace GameEngineLib.Defaults.Render
+namespace XEngine.Core.Defaults.Sprite
 {
     public sealed class SpriteComp : GameComponent
     {

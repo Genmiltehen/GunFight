@@ -1,6 +1,6 @@
-﻿using GameEngineLib.Impl.SceneImpl;
+﻿using XEngine.Core.Scenery;
 
-namespace GameEngineLib.Impl
+namespace XEngine.Core.Base
 {
     public interface IGameSystem
     {

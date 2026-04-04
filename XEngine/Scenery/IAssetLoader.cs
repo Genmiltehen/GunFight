@@ -1,6 +1,6 @@
-﻿using GameEngineLib.Impl.OpenGl;
+﻿using XEngine.Core.Graphics.OpenGL;
 
-namespace GameEngineLib.Impl.SceneImpl
+namespace XEngine.Core.Scenery
 {
     public interface IAssetLoader
     {

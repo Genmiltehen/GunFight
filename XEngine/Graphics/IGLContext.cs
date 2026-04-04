@@ -1,6 +1,6 @@
-﻿using GameEngineLib.Impl.OpenGl;
+﻿using XEngine.Core.Graphics.OpenGL;
 
-namespace GameEngineLib.Impl.RenderImpl
+namespace XEngine.Core.Graphics
 {
     public interface IGLContext
     {

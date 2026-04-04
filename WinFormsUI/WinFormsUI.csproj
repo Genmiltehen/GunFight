@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\XEngine\GameEngineLib.csproj" />
+    <ProjectReference Include="..\XEngine\XEngine.Core.csproj" />
   </ItemGroup>
 
 </Project>

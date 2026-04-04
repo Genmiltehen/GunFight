@@ -1,8 +1,8 @@
-﻿using GameEngineLib.Impl.SceneImpl;
+﻿using XEngine.Core.Scenery;
 
-namespace GameEngineLib.Impl.RenderImpl
+namespace XEngine.Core.Graphics
 {
-    public interface IRenderSystem
+    public interface IRenderModule
     {
         public bool IsEnabled { get; set; }
         public int Priority { get; }

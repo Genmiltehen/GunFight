@@ -1,12 +1,7 @@
-﻿using GameEngineLib.Impl;
-using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK.Mathematics;
+using XEngine.Core.Base;
 
-namespace GameEngineLib.Defaults
+namespace XEngine.Core.Defaults
 {
     public sealed class TransformComp : GameComponent
     {

@@ -1,38 +1,39 @@
-﻿using GameEngineLib.Defaults;
-using GameEngineLib.Defaults.Render;
-using GameEngineLib.Impl.OpenGl;
-using GameEngineLib.Impl.RenderImpl;
-using GameEngineLib.Impl.SceneImpl;
-using OpenTK.Graphics.OpenGL4;
-using System.Diagnostics;
+﻿using XEngine.Core.Defaults.Sprite;
+using XEngine.Core.Defaults;
+using XEngine.Core.Graphics;
+using XEngine.Core.Graphics.OpenGL;
+using XEngine.Core.Scenery;
 
-namespace GameEngineLib.Impl
+namespace XEngine.Core
 {
     public class GameEngine
     {
-        private AssetManager _assets;
-        private SceneManager _sceneManager;
-        private RenderPipeline _renderPipeline;
+        private readonly AssetManager _assets;
+        private readonly SceneManager _sceneManager;
+        private readonly RenderPipeline _renderPipeline;
 
         public AssetManager Assets => _assets;
         public RenderPipeline Renderer => _renderPipeline;
         public SceneManager SceneManager => _sceneManager;
 
-        public GameEngine() { }
-
-        public void Init(string AssetPath)
+        public GameEngine(string AssetPath)
         {
             _assets = new AssetManager(AssetPath);
             _sceneManager = new SceneManager(_assets);
             _renderPipeline = new RenderPipeline();
+        }
 
-            var _r = new RendererSystem(_assets);
-            _renderPipeline.AddRenderer(_r);
+        public void Init()
+        {
+            _assets.Init();
+
+            var _r = new SpriteRendererModule(_assets);
+            _renderPipeline.AddRenderModule(_r);
         }
 
         public void AddCamera()
         {
-            var _cam = _sceneManager.CurrentScene!.CreateEntity("MainCamera");
+            var _cam = _sceneManager.CurrentScene!.CreateEntity();
             _cam.AddComponent<TransformComp>();
             _cam.AddComponent<CameraComp>().Init(_renderPipeline, 0);
         }

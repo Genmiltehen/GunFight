@@ -1,11 +1,11 @@
-﻿using GameEngineLib.Impl.RenderImpl;
-using GameEngineLib.Impl.SceneImpl;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using XEngine.Core.Graphics;
+using XEngine.Core.Scenery;
 
-namespace GameEngineLib.Defaults.Render
+namespace XEngine.Core.Defaults.Sprite
 {
-    public class RendererSystem : IRenderSystem
+    public class SpriteRendererModule : IRenderModule
     {
         public int Priority => 500;
         public bool IsEnabled { get; set; } = true;
@@ -15,7 +15,7 @@ namespace GameEngineLib.Defaults.Render
         private int _screenHeight;
         private Matrix4 _projection;
 
-        public RendererSystem(IGLContext context)
+        public SpriteRendererModule(IGLContext context)
         {
             _context = context;
         }

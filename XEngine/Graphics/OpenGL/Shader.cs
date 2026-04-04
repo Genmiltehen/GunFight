@@ -2,7 +2,7 @@
 using OpenTK.Mathematics;
 using System.Diagnostics;
 
-namespace GameEngineLib.Impl.OpenGl
+namespace XEngine.Core.Graphics.OpenGL
 {
     public sealed class Shader : IDisposable
     {

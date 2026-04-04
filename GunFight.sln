@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36930.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{CB9B791B-96AE-4CE5-94E8-D9AD5D00398E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngineLib", "XEngine\GameEngineLib.csproj", "{2C440BD7-D687-42C1-B467-372F195E1CB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XEngine.Core", "XEngine\XEngine.Core.csproj", "{2C440BD7-D687-42C1-B467-372F195E1CB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

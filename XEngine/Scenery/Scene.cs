@@ -1,6 +1,6 @@
-﻿using GameEngineLib.Impl.RenderImpl;
+﻿using XEngine.Core.Base;
 
-namespace GameEngineLib.Impl.SceneImpl
+namespace XEngine.Core.Scenery
 {
     public class Scene
     {
@@ -13,9 +13,9 @@ namespace GameEngineLib.Impl.SceneImpl
         {
             AssetsLoader = assetsLoader;
         }
-        public Entity CreateEntity(string name)
+        public Entity CreateEntity()
         {
-            var _e = new Entity() { Name = name };
+            var _e = new Entity();
             _entities.Add(_e);
             return _e;
         }

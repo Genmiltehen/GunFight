@@ -1,9 +1,10 @@
-using GameEngineLib.Impl;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using WinFormsUI.Game;
+using XEngine.Core;
 
 namespace WinFormsUI
 {
@@ -22,7 +23,8 @@ namespace WinFormsUI
         public MainForm()
         {
             InitializeComponent();
-            _engine = new GameEngine();
+            string assetsPath = Path.Combine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight", "Assets");
+            _engine = new GameEngine(assetsPath);
         }
 
         private void MainFormLoad(object sender, EventArgs e)
@@ -45,7 +47,7 @@ namespace WinFormsUI
             GL.DepthFunc(DepthFunction.Lequal);
             GL.ClearColor(Color.Black);
 
-            _engine.Init("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight\\Assets");
+            _engine.Init();
         }
 
         private void OnGLPaint(object sender, PaintEventArgs e)
@@ -73,8 +75,6 @@ namespace WinFormsUI
 
         private void MainFormResize(object sender, EventArgs e)
         {
-            base.OnResize(e);
-
             int width = ClientSize.Width;
             int height = ClientSize.Height;
 

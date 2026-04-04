@@ -1,14 +1,7 @@
-﻿using GameEngineLib.Impl.RenderImpl;
-using GameEngineLib.Impl.SceneImpl;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using XEngine.Core.Scenery;
 
-namespace GameEngineLib.Impl.OpenGl
+namespace XEngine.Core.Graphics.OpenGL
 {
     public sealed class AssetManager : IAssetLoader, IGLContext, IDisposable
     {
@@ -23,7 +16,10 @@ namespace GameEngineLib.Impl.OpenGl
         public AssetManager(string AssetPath)
         {
             _rootPath = Path.GetFullPath(AssetPath);
+        }
 
+        public void Init()
+        {
             UnitQuad = new UnitQuad();
 
             InitDefaultSpriteShader();
@@ -33,8 +29,8 @@ namespace GameEngineLib.Impl.OpenGl
 
         private void InitDefaultTexture()
         {
-            var path = Path.Combine(_rootPath, "Textures", "Error.png");
-            _persistentTextures["Default_Error"] = Texture2D.FromPath(path);
+            byte[] pixels = [255, 0, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 0, 255, 255];
+            _persistentTextures["Default_Error"] = Texture2D.FromBytes(2, 2, pixels);
         }
 
         private void InitErrorShader()
@@ -60,7 +56,7 @@ namespace GameEngineLib.Impl.OpenGl
 
         public Texture2D LoadTexture(string relativePath, bool isPersistent = false)
         {
-            string fullPath = Path.GetFullPath(Path.Combine(_rootPath, "Textures" ,relativePath));
+            string fullPath = Path.GetFullPath(Path.Combine(_rootPath, "Textures", relativePath));
             var targetDict = isPersistent ? _persistentTextures : _sceneTextures;
 
             if (_persistentTextures.TryGetValue(fullPath, out var pTex)) return pTex;

@@ -1,30 +1,23 @@
-﻿using GameEngineLib.Impl.SceneImpl;
-using OpenTK.Graphics.OpenGL4;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK.Graphics.OpenGL4;
+using XEngine.Core.Scenery;
 
-namespace GameEngineLib.Impl.RenderImpl
+
+namespace XEngine.Core.Graphics
 {
     public class RenderPipeline
     {
-        private readonly List<IRenderSystem> _renderers = [];
+        private readonly List<IRenderModule> _renderModules = [];
         private readonly List<CameraComp> _activeCameras = [];
 
-        public void AddRenderer(IRenderSystem renderer)
+        public void AddRenderModule(IRenderModule renderModule)
         {
-            _renderers.Add(renderer);
-            _renderers.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+            _renderModules.Add(renderModule);
+            _renderModules.Sort((a, b) => a.Priority.CompareTo(b.Priority));
         }
 
         public void RegisterCamera(CameraComp camera)
         {
-            if (!_activeCameras.Contains(camera))
-                _activeCameras.Add(camera);
+            if (!_activeCameras.Contains(camera)) _activeCameras.Add(camera);
             _activeCameras.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
@@ -33,7 +26,7 @@ namespace GameEngineLib.Impl.RenderImpl
         public void SetViewport(int width, int height)
         {
             GL.Viewport(0, 0, width, height);
-            foreach (var _r in _renderers) _r.OnResize(width, height);
+            foreach (var _r in _renderModules) _r.OnResize(width, height);
         }
 
         public void Render(Scene scene)
@@ -42,7 +35,7 @@ namespace GameEngineLib.Impl.RenderImpl
             if (_activeCameras.Count == 0) return;
 
             foreach (var camera in _activeCameras)
-                foreach (var _r in _renderers)
+                foreach (var _r in _renderModules)
                     if (_r.IsEnabled)
                         _r.Render(scene, camera);
         }

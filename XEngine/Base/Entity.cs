@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameEngineLib.Impl
+﻿namespace XEngine.Core.Base
 {
     public class Entity
     {
-        public required string Name { get; set; }
         private readonly Dictionary<Type, GameComponent> _components = [];
 
         internal Entity() { }

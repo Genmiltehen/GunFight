@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameEngineLib.Impl.OpenGl
+namespace XEngine.Core.Graphics.OpenGL
 {
     public class UnitQuad : IDisposable
     {
