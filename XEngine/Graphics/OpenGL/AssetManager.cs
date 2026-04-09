@@ -5,23 +5,21 @@ namespace XEngine.Core.Graphics.OpenGL
 {
     public sealed class AssetManager : IAssetLoader, IGLContext, IDisposable
     {
-        private readonly string _rootPath;
-
         public UnitQuad UnitQuad { get; private set; }
+        private readonly string RootPath;
         private readonly Dictionary<string, Shader> _shaders = [];
-
         private readonly Dictionary<string, Texture2D> _persistentTextures = [];
         private readonly Dictionary<string, Texture2D> _sceneTextures = [];
 
         public AssetManager(string AssetPath)
         {
-            _rootPath = Path.GetFullPath(AssetPath);
+            RootPath = Path.GetFullPath(AssetPath);
+            UnitQuad = new UnitQuad();
         }
 
         public void Init()
         {
-            UnitQuad = new UnitQuad();
-
+            UnitQuad.Init();
             InitDefaultSpriteShader();
             InitErrorShader();
             InitDefaultTexture();
@@ -35,13 +33,13 @@ namespace XEngine.Core.Graphics.OpenGL
 
         private void InitErrorShader()
         {
-            var _shaderPath = Path.Combine(_rootPath, "Shaders", "Error");
+            var _shaderPath = Path.Combine(RootPath, "Shaders", "Error");
             _shaders["Error"] = Shader.FromFolder(_shaderPath);
         }
 
         private void InitDefaultSpriteShader()
         {
-            var _shaderPath = Path.Combine(_rootPath, "Shaders", "Default");
+            var _shaderPath = Path.Combine(RootPath, "Shaders", "Default");
             _shaders["Sprite"] = Shader.FromFolder(_shaderPath);
         }
 
@@ -56,7 +54,7 @@ namespace XEngine.Core.Graphics.OpenGL
 
         public Texture2D LoadTexture(string relativePath, bool isPersistent = false)
         {
-            string fullPath = Path.GetFullPath(Path.Combine(_rootPath, "Textures", relativePath));
+            string fullPath = Path.GetFullPath(Path.Combine(RootPath, "Textures", relativePath));
             var targetDict = isPersistent ? _persistentTextures : _sceneTextures;
 
             if (_persistentTextures.TryGetValue(fullPath, out var pTex)) return pTex;
@@ -84,6 +82,10 @@ namespace XEngine.Core.Graphics.OpenGL
             UnitQuad.Dispose();
             foreach (var _s in _shaders.Values) _s.Dispose();
             _shaders.Clear();
+            foreach (var tex in _sceneTextures.Values) tex.Dispose();
+            _sceneTextures.Clear();
+            foreach (var tex in _persistentTextures.Values) tex.Dispose();
+            _persistentTextures.Clear();
         }
     }
 }

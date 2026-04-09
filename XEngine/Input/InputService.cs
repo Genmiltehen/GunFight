@@ -1,41 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using XEngine.Core.Config;
+using XEngine.Core.Input.InputAxis;
 
 namespace XEngine.Core.Input
 {
     public class InputService
     {
-        private readonly Dictionary<Keys, string> _actionMap = [];
-        private readonly HashSet<string> _activeActions = [];
+        private readonly Dictionary<string, List<Keys>> _actionBindings = [];
+        private readonly HashSet<Keys> _downKeys = [];
+        private readonly Dictionary<string, Axis> _axes = [];
 
-        public InputService(Control control)
+        public InputService() { }
+
+        public void LoadBindingsFromConfig(GameConfig config)
         {
-            control.KeyDown += OnKeyDown;
-            control.KeyUp += OnKeyUp;
+            foreach (var keyBinding in config.KeyMap) BindAction(keyBinding.Key, keyBinding.Value);
+            foreach (var axisBinding in config.Axes) _axes[axisBinding.Key] = new Axis(axisBinding.Value);
         }
 
-        public void BindAction(Keys key, string actionName)
+        public void Update(float dt)
         {
-            _actionMap[key] = actionName;
+            foreach (var axis in _axes.Values) axis.Update(this, dt);
         }
 
+        public void BindAction(string actionName, Keys key)
+        {
+            if (!_actionBindings.ContainsKey(actionName))
+                _actionBindings[actionName] = [];
+
+            _actionBindings[actionName].Add(key);
+        }
+
+        public void SetKeyDown(Keys key) => _downKeys.Add(key);
+        public void SetKeyUp(Keys key) => _downKeys.Remove(key);
+        public void ClearStates() => _downKeys.Clear();
+        public float GetAxis(string axisName) => _axes.TryGetValue(axisName, out var a) ? a.Value : 0f;
         public bool IsActionActive(string actionName)
         {
-            return _activeActions.Contains(actionName);
-        }
-
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (_actionMap.TryGetValue(e.KeyCode, out var actionName)) _activeActions.Add(actionName);
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            if (_actionMap.TryGetValue(e.KeyCode, out var actionName)) _activeActions.Remove(actionName);
+            if (!_actionBindings.TryGetValue(actionName, out var keys))
+                return false;
+            foreach (var key in keys) if (_downKeys.Contains(key)) return true;
+            return false;
         }
     }
 }

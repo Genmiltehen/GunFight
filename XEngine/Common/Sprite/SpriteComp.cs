@@ -2,7 +2,7 @@
 using XEngine.Core.Base;
 using XEngine.Core.Graphics.OpenGL;
 
-namespace XEngine.Core.Defaults.Sprite
+namespace XEngine.Core.Common.Sprite
 {
     public sealed class SpriteComp : GameComponent
     {

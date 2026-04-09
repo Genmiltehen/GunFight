@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 using XEngine.Core.Graphics;
 using XEngine.Core.Scenery;
 
-namespace XEngine.Core.Defaults.Sprite
+namespace XEngine.Core.Common.Sprite
 {
     public class SpriteRendererModule : IRenderModule
     {
@@ -29,7 +29,7 @@ namespace XEngine.Core.Defaults.Sprite
             _projection = Matrix4.CreateOrthographicOffCenter(-halfW, halfW, -halfH, halfH, -1f, 1f);
         }
 
-        public void Render(Scene scene, CameraComp camera)
+        public void Render(Scene scene)
         {
             if (!ValidateDraw(scene)) return;
 
@@ -37,7 +37,7 @@ namespace XEngine.Core.Defaults.Sprite
             shader.Use();
 
             shader.SetMatrix4("uProjection", _projection);
-            shader.SetMatrix4("uView", camera.GetViewMatrix());
+            shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
             shader.SetInt("uTexture", 0);
             GL.ActiveTexture(TextureUnit.Texture0);
 

@@ -12,7 +12,9 @@ namespace XEngine.Core.Graphics.OpenGL
         private int _vao, _vbo, _ebo;
         private bool _disposed = false;
 
-        public UnitQuad()
+        public UnitQuad() { }
+
+        public void Init()
         {
             float[] vertices = [ // (x, y) | (u, v)
                 -0.5f,  0.5f, 0.0f, 1.0f,

@@ -1,18 +1,29 @@
 ﻿using XEngine.Core.Base;
+using XEngine.Core.Common;
+using XEngine.Core.Graphics;
+using XEngine.Core.Input;
 
 namespace XEngine.Core.Scenery
 {
     public class Scene
     {
-        protected readonly IAssetLoader AssetsLoader;
+        protected readonly IAssetLoader Assets;
+        protected InputService Input;
 
         private readonly List<Entity> _entities = [];
         private readonly List<IGameSystem> _systems = [];
+        public CameraComp Camera { get; private set; }
 
-        protected Scene(IAssetLoader assetsLoader)
+        public Scene(GameEngine _engine)
         {
-            AssetsLoader = assetsLoader;
+            Assets = _engine.Assets;
+            Input = _engine.Input;
+
+            var _cam = CreateEntity();
+            Camera = _cam.AddComponent<CameraComp>();
+            _cam.AddComponent<TransformComp>();
         }
+
         public Entity CreateEntity()
         {
             var _e = new Entity();

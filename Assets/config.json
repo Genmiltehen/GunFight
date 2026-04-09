@@ -1,0 +1,23 @@
+{
+	"other": [],
+	"keymap": {
+		"up": "W",
+		"down": "S",
+		"left": "A",
+		"right": "D"
+	},
+	"axes": {
+		"Horzontal": {
+			"positive": "right",
+			"negative": "left",
+			"sensitivity": 10,
+			"gravity": 10
+		},
+		"Vertical": {
+			"positive": "up",
+			"negative": "down",
+			"sensitivity": 10,
+			"gravity": 10
+		}
+	}
+}

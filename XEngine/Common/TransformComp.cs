@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using XEngine.Core.Base;
 
-namespace XEngine.Core.Defaults
+namespace XEngine.Core.Common
 {
     public sealed class TransformComp : GameComponent
     {

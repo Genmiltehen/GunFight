@@ -60,9 +60,14 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(MainGLControl);
+            KeyPreview = true;
             Name = "MainForm";
             Text = "Form1";
+            Deactivate += OnLostGlobalFacus;
+            FormClosing += OnClose;
             Load += MainFormLoad;
+            KeyDown += MainForm_OnKeyDown;
+            KeyUp += MainForm_OnKeyUp;
             Resize += MainFormResize;
             ResumeLayout(false);
         }

@@ -1,9 +1,7 @@
-using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
-using System;
 using System.Diagnostics;
-using System.Windows.Forms;
 using WinFormsUI.Game;
+using WinFormsUI.Game.Input;
 using XEngine.Core;
 
 namespace WinFormsUI
@@ -16,13 +14,13 @@ namespace WinFormsUI
 
         private double _accumulator = 0;
         private double _lastTime = 0;
-
         private const double TargetUpdateFPS = 60.0;
         private const double _dt = 1.0 / TargetUpdateFPS;
 
         public MainForm()
         {
             InitializeComponent();
+
             string assetsPath = Path.Combine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight", "Assets");
             _engine = new GameEngine(assetsPath);
         }
@@ -34,8 +32,7 @@ namespace WinFormsUI
             _engine.Renderer.SetViewport(width, height);
 
 
-            _engine.SceneManager.SwitchTo(new TestScene(_engine.Assets));
-            _engine.AddCamera();
+            _engine.SceneManager.SwitchTo(new TestScene(_engine));
 
             _stopwatch.Start();
             MainTimer.Start();
@@ -80,5 +77,14 @@ namespace WinFormsUI
 
             if (width > 0 && height > 0) _engine.Renderer.SetViewport(width, height);
         }
+
+        private void OnClose(object sender, FormClosingEventArgs e)
+        {
+            _engine.Assets.Dispose();
+        }
+
+        private void MainForm_OnKeyDown(object sender, KeyEventArgs e) => _engine.Input.SetKeyDown(KeyConverter.ToOpenTK(e.KeyCode));
+        private void MainForm_OnKeyUp(object sender, KeyEventArgs e) => _engine.Input.SetKeyUp(KeyConverter.ToOpenTK(e.KeyCode));
+        private void OnLostGlobalFacus(object sender, EventArgs e) => _engine.Input.ClearStates();
     }
 }

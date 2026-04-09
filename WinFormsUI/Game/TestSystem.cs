@@ -1,29 +1,20 @@
 ﻿using OpenTK.Mathematics;
 using XEngine.Core.Base;
-using XEngine.Core.Defaults;
+using XEngine.Core.Common;
+using XEngine.Core.Input;
 using XEngine.Core.Scenery;
 
 namespace WinFormsUI.Game
 {
-    public class TestSystem : IGameSystem
+    public class TestSystem(InputService input) : InputSystem(input)
     {
-        private float _t;
-        public TestSystem()
+        public override void Update(Scene _scene, float _dt)
         {
-            _t = 0;
-        }
-
-        public int Priority => 0;
-
-        public void Update(Scene _scene, float _dt)
-        {
-            float x = 100;
-            _t += _dt;
+            float h = input.GetAxis("Horzontal");
+            float v = input.GetAxis("Vertical");
             foreach (var (_e, transform) in _scene.Query<TransformComp>(_e => _e.Has<PlayerTag>()))
             {
-                transform.Position = new Vector3((float)Math.Cos(_t), (float)Math.Sin(_t), transform.Position.Z / x) * x;
-                transform.Scale = new Vector2((float)Math.Cos(_t) + 2, (float)Math.Cos(_t) + 2) / 3;
-                transform.Rotation = _t;
+                transform.Position += new Vector3(h, v, 0) * _dt * 100;
             }
         }
     }
