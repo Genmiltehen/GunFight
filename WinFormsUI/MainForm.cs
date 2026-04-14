@@ -3,6 +3,7 @@ using System.Diagnostics;
 using WinFormsUI.Game;
 using WinFormsUI.Game.Input;
 using XEngine.Core;
+using XEngine.Core.Graphics.OpenGL;
 
 namespace WinFormsUI
 {
@@ -36,6 +37,8 @@ namespace WinFormsUI
 
             _stopwatch.Start();
             MainTimer.Start();
+
+            Activate();
         }
 
         private void OnGLLoad(object sender, EventArgs e)
@@ -45,6 +48,9 @@ namespace WinFormsUI
             GL.ClearColor(Color.Black);
 
             _engine.Init();
+
+            var debugShaderFolder = Path.Combine(_engine.Assets.ShaderPath, "Debuging");
+            _engine.Assets.SetShader("CapsuleDebug", Shader.FromFolder(Path.Combine(debugShaderFolder, "Capsule")));
         }
 
         private void OnGLPaint(object sender, PaintEventArgs e)

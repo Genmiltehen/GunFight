@@ -2,6 +2,7 @@
 using System.Text.Json;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Config;
+using XEngine.Core.DebugUtils.Render;
 using XEngine.Core.Graphics;
 using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Input;
@@ -37,7 +38,10 @@ namespace XEngine.Core
             _assets.Init();
 
             var spriteRenderer = new SpriteRendererModule(_assets);
+            var debugCapsuleRenderer = new DebugCapsuleRendererModule(_assets);
+
             _renderPipeline.AddRenderModule(spriteRenderer);
+            _renderPipeline.AddRenderModule(debugCapsuleRenderer);
 
             _input.LoadBindingsFromConfig(_config);
         }

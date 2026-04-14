@@ -6,9 +6,9 @@ namespace XEngine.Core.Graphics
 {
     public class RenderPipeline
     {
-        private readonly List<IRenderModule> _renderModules = [];
+        private readonly List<RenderModule> _renderModules = [];
 
-        public void AddRenderModule(IRenderModule renderModule)
+        public void AddRenderModule(RenderModule renderModule)
         {
             _renderModules.Add(renderModule);
             _renderModules.Sort((a, b) => a.Priority.CompareTo(b.Priority));

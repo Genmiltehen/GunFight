@@ -5,31 +5,17 @@ using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Common.Sprite
 {
-    public class SpriteRendererModule : IRenderModule
+    public class SpriteRendererModule : RenderModule
     {
-        public int Priority => 500;
-        public bool IsEnabled { get; set; } = true;
-
+        public override int Priority => 500;
         private readonly IGLContext _context;
-        private int _screenWidth;
-        private int _screenHeight;
-        private Matrix4 _projection;
 
         public SpriteRendererModule(IGLContext context)
         {
             _context = context;
         }
 
-        public void OnResize(int width, int height)
-        {
-            _screenWidth = width;
-            _screenHeight = height;
-            float halfW = _screenWidth / 2f;
-            float halfH = _screenHeight / 2f;
-            _projection = Matrix4.CreateOrthographicOffCenter(-halfW, halfW, -halfH, halfH, -1f, 1f);
-        }
-
-        public void Render(Scene scene)
+        public override void Render(Scene scene)
         {
             if (!ValidateDraw(scene)) return;
 
@@ -46,7 +32,7 @@ namespace XEngine.Core.Common.Sprite
             {
                 sprite.Texture.Use();
 
-                var modelMatrix = sprite.GetAssetScale() * transform.GetMatrix();
+                var modelMatrix = sprite.GetAssetScale() * transform.GetWorldMatrix();
                 shader.SetMatrix4("uModel", modelMatrix);
 
                 _context.UnitQuad.Draw();

@@ -4,7 +4,9 @@
 		"up": "W",
 		"down": "S",
 		"left": "A",
-		"right": "D"
+		"right": "D",
+		"cw": "Q",
+		"ccw": "E"
 	},
 	"axes": {
 		"Horzontal": {
@@ -16,6 +18,12 @@
 		"Vertical": {
 			"positive": "up",
 			"negative": "down",
+			"sensitivity": 10,
+			"gravity": 10
+		},
+		"Rotato": {
+			"positive": "cw",
+			"negative": "ccw",
 			"sensitivity": 10,
 			"gravity": 10
 		}

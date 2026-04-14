@@ -5,11 +5,14 @@ namespace XEngine.Core.Graphics.OpenGL
 {
     public sealed class AssetManager : IAssetLoader, IGLContext, IDisposable
     {
-        public UnitQuad UnitQuad { get; private set; }
-        private readonly string RootPath;
         private readonly Dictionary<string, Shader> _shaders = [];
         private readonly Dictionary<string, Texture2D> _persistentTextures = [];
         private readonly Dictionary<string, Texture2D> _sceneTextures = [];
+
+        public readonly string RootPath;
+        public string ShaderPath => Path.Combine(RootPath, "Shaders");
+        public UnitQuad UnitQuad { get; private set; }
+
 
         public AssetManager(string AssetPath)
         {
@@ -50,6 +53,13 @@ namespace XEngine.Core.Graphics.OpenGL
             Debug.WriteLine($"[Error] Shader '{name}' not found! Falling back to ErrorShader.");
             return _shaders.GetValueOrDefault("Error")
                    ?? throw new Exception("Critical: ErrorShader is missing from AssetManager!");
+        }
+
+        public bool SetShader(string name, Shader shader)
+        {
+            if (_shaders.ContainsKey(name)) return false;
+            _shaders[name] = shader;
+            return true;
         }
 
         public Texture2D LoadTexture(string relativePath, bool isPersistent = false)

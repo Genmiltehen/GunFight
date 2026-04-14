@@ -7,10 +7,11 @@ namespace XEngine.Core.Scenery
 {
     public class Scene
     {
+        protected int _id = 0;
         protected readonly IAssetLoader Assets;
         protected InputService Input;
 
-        private readonly List<Entity> _entities = [];
+        private readonly Dictionary<int, Entity> _entities = [];
         private readonly List<IGameSystem> _systems = [];
         public CameraComp Camera { get; private set; }
 
@@ -26,8 +27,9 @@ namespace XEngine.Core.Scenery
 
         public Entity CreateEntity()
         {
-            var _e = new Entity();
-            _entities.Add(_e);
+            int id = _id++;
+            var _e = new Entity(id);
+            _entities[id] = _e;
             return _e;
         }
 
@@ -51,12 +53,12 @@ namespace XEngine.Core.Scenery
 
         public IEnumerable<Entity> Query(Predicate<Entity> _predicate)
         {
-            foreach (var entity in _entities) if (_predicate(entity)) yield return entity;
+            foreach (var entity in _entities.Values) if (_predicate(entity)) yield return entity;
         }
         public IEnumerable<(Entity, T1)> Query<T1>(Predicate<Entity>? _predicate = null)
             where T1 : GameComponent
         {
-            foreach (var entity in _entities)
+            foreach (var entity in _entities.Values)
             {
                 if (_predicate != null && !_predicate(entity)) continue;
                 if (entity.Has<T1>())
@@ -69,7 +71,7 @@ namespace XEngine.Core.Scenery
             where T1 : GameComponent
             where T2 : GameComponent
         {
-            foreach (var entity in _entities)
+            foreach (var entity in _entities.Values)
             {
                 if (_predicate != null && !_predicate(entity)) continue;
 
@@ -84,7 +86,7 @@ namespace XEngine.Core.Scenery
             where T2 : GameComponent
             where T3 : GameComponent
         {
-            foreach (var _e in _entities)
+            foreach (var _e in _entities.Values)
             {
                 if (_predicate != null && !_predicate(_e)) continue;
 

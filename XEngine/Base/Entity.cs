@@ -3,8 +3,12 @@
     public class Entity
     {
         private readonly Dictionary<Type, GameComponent> _components = [];
+        public int Id { get; private set; }
 
-        internal Entity() { }
+        internal Entity(int id)
+        {
+            Id = id;
+        }
 
         public T AddComponent<T>() where T : GameComponent, new()
         {
