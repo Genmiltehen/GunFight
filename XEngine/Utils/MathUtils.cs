@@ -1,6 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System.Linq;
-using XEngine.Core.Input.InputAxis;
 
 namespace XEngine.Core.Utils
 {
@@ -23,17 +21,24 @@ namespace XEngine.Core.Utils
             return new Vector2(-v.Y, v.X);
         }
 
+        public static Vector2 PerpTowards(Vector2 v, Vector2 normal)
+        {
+            Vector2 res = new(v.Y, -v.X);
+            if (Vector2.Dot(res, normal) < 0) res = -res;
+            return res;
+        }
+
         public static bool Box2Intersect(Box2 a, Box2 b)
         {
             return a.Min.X <= b.Max.X && a.Max.X >= b.Min.X &&
                    a.Min.Y <= b.Max.Y && a.Max.Y >= b.Min.Y;
         }
 
-        public static void ClosestPointsBetweenSegments(
-            Vector2 p1, Vector2 d1, Vector2 p2, Vector2 d2,
-            out Vector2 closestPoint1, out Vector2 closestPoint2)
+        public static void ClosestPointsBetweenSegments(Segment seg1, Segment seg2, out Vector2 closestPoint1, out Vector2 closestPoint2)
         {
-            Vector2 r = p1 - p2;
+            Vector2 r = seg1.start - seg2.start;
+            Vector2 d1 = seg1.Vector;
+            Vector2 d2 = seg2.Vector;
 
             float d1sq = Vector2.Dot(d1, d1);
             float d2sq = Vector2.Dot(d2, d2);
@@ -76,8 +81,8 @@ namespace XEngine.Core.Utils
                 t = 0f;
             }
 
-            closestPoint1 = p1 + d1 * s;
-            closestPoint2 = p2 + d2 * t;
+            closestPoint1 = seg1.Lerp(s);
+            closestPoint2 = seg2.Lerp(t);
         }
 
         public static Vector2 DirFromLineToPoint(Vector2 p, Vector2 origin, Vector2 dir)
@@ -87,7 +92,7 @@ namespace XEngine.Core.Utils
             return p_prime - dir * h;
         }
 
-        public static void PolygonBoundsAlongAxis(Vector2 axis, Vector2[] points, out float min, out float max)
+        public static void PolygonProjectionBounds(Vector2 axis, Vector2[] points, out float min, out float max)
         {
             max = min = Vector2.Dot(axis, points[0]);
 
@@ -99,7 +104,7 @@ namespace XEngine.Core.Utils
             }
         }
 
-        public static Vector2[] GetPolygonAxes(Vector2[] points)
+        public static Vector2[] GetPolygonNormals(Vector2[] points)
         {
             Vector2[] axes = new Vector2[points.Length];
             Vector2 prev = points[^1];
@@ -116,32 +121,6 @@ namespace XEngine.Core.Utils
             Vector2 center = Vector2.Zero;
             for (int i = 0; i < points.Length; i++) center += points[i];
             return center / points.Length;
-        }
-
-        public static bool TestSAT(Vector2[] pointsA, Vector2[] pointsB, out Vector2 normal)
-        {
-            normal = Vector2.Zero;
-            float minOverlap = float.MaxValue;
-            IEnumerable<Vector2> allAxes = GetPolygonAxes(pointsA).Concat(GetPolygonAxes(pointsB));
-
-            foreach (Vector2 axis in allAxes)
-            {
-                PolygonBoundsAlongAxis(axis, pointsA, out float minA, out float maxA);
-                PolygonBoundsAlongAxis(axis, pointsB, out float minB, out float maxB);
-                if (minA > maxB || minB > maxA) return false;
-
-                float overlap = Math.Min(maxA, maxB) - Math.Max(minA, minB);
-                if (overlap < minOverlap)
-                {
-                    minOverlap = overlap;
-                    normal = axis;
-                }
-            }
-
-            Vector2 centerA = CenterOfMass(pointsA);
-            Vector2 centerB = CenterOfMass(pointsB);
-            if (Vector2.Dot(normal, centerB - centerA) < 0) normal = -normal;
-            return true;
         }
     }
 }

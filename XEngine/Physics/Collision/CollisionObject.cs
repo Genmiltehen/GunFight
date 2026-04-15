@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Base;
 using XEngine.Core.Common;
+using XEngine.Core.Physics.Components;
 
-namespace XEngine.Core.Physics.Utils
+namespace XEngine.Core.Physics.Collision
 {
-    public struct PhysicsEntityData
+    public struct CollisionObject
     {
         public int entityId;
-        public RigidbodyComp rb;
+        public Rigidbody rb;
         public TransformComp tr;
-        public ColliderComp col;
+        public Collider col;
     }
 }

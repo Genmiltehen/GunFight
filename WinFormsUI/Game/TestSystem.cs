@@ -13,7 +13,7 @@ namespace WinFormsUI.Game
     {
         public override void Update(Scene scene, float dt)
         {
-            Func2(scene, dt);
+            //Func2(scene, dt);
         }
 
         private void Func1(Scene scene, float dt)

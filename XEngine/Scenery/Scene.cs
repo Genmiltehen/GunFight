@@ -51,6 +51,11 @@ namespace XEngine.Core.Scenery
 
         // --- Queries ---
 
+        public IEnumerable<Entity> IterateByIds(IEnumerable<int> ids)
+        {
+            foreach (var id in ids) yield return _entities[id];
+        }
+
         public IEnumerable<Entity> Query(Predicate<Entity> _predicate)
         {
             foreach (var entity in _entities.Values) if (_predicate(entity)) yield return entity;

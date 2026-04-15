@@ -28,10 +28,10 @@ namespace WinFormsUI
 
         private void MainFormLoad(object sender, EventArgs e)
         {
+            Debug.WriteLine("formload");
             int width = ClientSize.Width;
             int height = ClientSize.Height;
             _engine.Renderer.SetViewport(width, height);
-
 
             _engine.SceneManager.SwitchTo(new TestScene(_engine));
 
@@ -43,6 +43,7 @@ namespace WinFormsUI
 
         private void OnGLLoad(object sender, EventArgs e)
         {
+            Debug.WriteLine("glload");
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.ClearColor(Color.Black);
@@ -51,6 +52,7 @@ namespace WinFormsUI
 
             var debugShaderFolder = Path.Combine(_engine.Assets.ShaderPath, "Debuging");
             _engine.Assets.SetShader("CapsuleDebug", Shader.FromFolder(Path.Combine(debugShaderFolder, "Capsule")));
+            _engine.Assets.SetShader("BoxDebug", Shader.FromFolder(Path.Combine(debugShaderFolder, "Box")));
         }
 
         private void OnGLPaint(object sender, PaintEventArgs e)

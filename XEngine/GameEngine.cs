@@ -38,10 +38,13 @@ namespace XEngine.Core
             _assets.Init();
 
             var spriteRenderer = new SpriteRendererModule(_assets);
-            var debugCapsuleRenderer = new DebugCapsuleRendererModule(_assets);
-
             _renderPipeline.AddRenderModule(spriteRenderer);
+
+            var debugCapsuleRenderer = new DebugCapsuleRendererModule(_assets);
             _renderPipeline.AddRenderModule(debugCapsuleRenderer);
+
+            var debugBoxRenderer = new DebugBoxRendererModule(_assets);
+            _renderPipeline.AddRenderModule(debugBoxRenderer);
 
             _input.LoadBindingsFromConfig(_config);
         }

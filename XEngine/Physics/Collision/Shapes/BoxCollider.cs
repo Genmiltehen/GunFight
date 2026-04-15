@@ -1,9 +1,8 @@
 ﻿using OpenTK.Mathematics;
 using XEngine.Core.Common;
-using XEngine.Core.Physics.Utils;
 using XEngine.Core.Utils;
 
-namespace XEngine.Core.Physics.ColliderShapes
+namespace XEngine.Core.Physics.Collision.Shapes
 {
     public sealed class BoxCollider : ICollider
     {
@@ -23,11 +22,17 @@ namespace XEngine.Core.Physics.ColliderShapes
             }
         }
         public Vector2 Size => _hs * 2;
+        public Vector2 HalfSize => _hs;
         public ColliderType ColliderType => ColliderType.Box;
 
         public BoxCollider(Vector2 size)
         {
             _hs = size * 0.5f;
+        }
+
+        public BoxCollider(float width, float height)
+        {
+            _hs = new Vector2(width, height) * 0.5f;
         }
 
         public Box2 GetBounds(TransformComp tr)
@@ -45,7 +50,7 @@ namespace XEngine.Core.Physics.ColliderShapes
         public void GetProjection(Vector2 axis, TransformComp tr, out float min, out float max)
         {
             Vector2[] corners = GetCorners(tr);
-            MathUtils.PolygonBoundsAlongAxis(axis, corners, out min, out max);
+            MathUtils.PolygonProjectionBounds(axis, corners, out min, out max);
         }
 
         public static void CalcAxes(TransformComp tr, out Vector2 axis1, out Vector2 axis2)
@@ -55,7 +60,7 @@ namespace XEngine.Core.Physics.ColliderShapes
             axis2 = new Vector2(-sin, cos);
         }
 
-        public float UnitMassMoI => (Vector2.Dot(Size, Size)) / 12;
+        public float UnitMassMoI => Vector2.Dot(Size, Size) / 12;
 
         // Optimizations
 

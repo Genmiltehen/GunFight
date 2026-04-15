@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System.Xml.Linq;
 using XEngine.Core.Base;
-using XEngine.Core.Physics.Utils;
+using XEngine.Core.Physics.Components;
 
 namespace XEngine.Core.Common
 {
@@ -60,7 +60,7 @@ namespace XEngine.Core.Common
 
         public void SetDirty()
         {
-            Owner.Get<ColliderComp>()?.SetDirty();
+            Owner.Get<Collider>()?.SetDirty();
             if (_isDirty) return;
             _isDirty = true;
 

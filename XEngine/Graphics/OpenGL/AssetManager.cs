@@ -50,9 +50,9 @@ namespace XEngine.Core.Graphics.OpenGL
         {
             if (_shaders.TryGetValue(name, out var shader)) return shader;
 
-            Debug.WriteLine($"[Error] Shader '{name}' not found! Falling back to ErrorShader.");
+            Debug.WriteLine($"[Error] Shader '{name}' not found. Falling back to ErrorShader.");
             return _shaders.GetValueOrDefault("Error")
-                   ?? throw new Exception("Critical: ErrorShader is missing from AssetManager!");
+                   ?? throw new Exception("[Error] ErrorShader is missing.");
         }
 
         public bool SetShader(string name, Shader shader)

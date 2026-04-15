@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XEngine.Core.Physics.Utils
+namespace XEngine.Core.Physics.MathStructs
 {
     public struct ContactPoint
     {

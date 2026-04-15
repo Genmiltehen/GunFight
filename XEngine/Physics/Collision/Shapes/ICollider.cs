@@ -1,8 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using XEngine.Core.Common;
-using XEngine.Core.Physics.Utils;
 
-namespace XEngine.Core.Physics.ColliderShapes
+namespace XEngine.Core.Physics.Collision.Shapes
 {
     public interface ICollider : IDirty
     {

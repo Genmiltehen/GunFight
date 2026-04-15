@@ -1,16 +1,16 @@
 ﻿using OpenTK.Mathematics;
 using XEngine.Core.Base;
 using XEngine.Core.Common;
-using XEngine.Core.Physics.ColliderShapes;
+using XEngine.Core.Physics.Collision.Shapes;
 
-namespace XEngine.Core.Physics.Utils
+namespace XEngine.Core.Physics.Components
 {
-    public class ColliderComp : GameComponent, IDirty
+    public class Collider : GameComponent, IDirty
     {
         public ICollider Shape { get; set; }
         public bool IsTrigger;
 
-        public ColliderComp Init(ICollider shape, Vector2 offset)
+        public Collider Init(ICollider shape, Vector2 offset)
         {
             Shape = shape;
             Shape.Offset = offset;

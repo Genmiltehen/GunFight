@@ -1,16 +1,14 @@
 ﻿using OpenTK.Mathematics;
-using System.Drawing;
 using XEngine.Core.Common;
-using XEngine.Core.Physics.Utils;
+using XEngine.Core.Utils;
 
-namespace XEngine.Core.Physics.ColliderShapes
+namespace XEngine.Core.Physics.Collision.Shapes
 {
     public class CapsuleCollider : ICollider
     {
         private readonly float _hl;
         private readonly float _r;
-        private Vector2 _cache_a;
-        private Vector2 _cache_b;
+        private Segment _cache_seg;
         private bool _isDirty = true;
         private Vector2 _offset;
 
@@ -36,8 +34,8 @@ namespace XEngine.Core.Physics.ColliderShapes
 
         public Box2 GetBounds(TransformComp tr)
         {
-            GetPoints(tr, out Vector2 a, out Vector2 b);
-            return new Box2(a, b).Inflated(new Vector2(_r, _r));
+            GetSegment(tr, out Segment seg);
+            return new Box2(seg.start, seg.end).Inflated(new Vector2(_r, _r));
         }
 
         public float UnitMassMoI
@@ -57,18 +55,21 @@ namespace XEngine.Core.Physics.ColliderShapes
             }
         }
 
-        public void GetPoints(TransformComp tr, out Vector2 a, out Vector2 b)
+        public void GetSegment(TransformComp tr, out Segment segment)
         {
             if (_isDirty)
             {
                 Vector2 center = tr.Position2D + Offset;
                 var (sin, cos) = MathF.SinCos(tr.Rotation);
                 Vector2 dir = new(cos, sin);
-                _cache_a = center - dir * _hl;
-                _cache_b = center + dir * _hl;
+                _cache_seg = new()
+                {
+                    start = center - dir * _hl,
+                    end = center + dir * _hl
+                };
                 _isDirty = false;
             }
-            a = _cache_a; b = _cache_b;
+            segment = _cache_seg;
         }
 
         public void SetDirty()

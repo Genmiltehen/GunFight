@@ -44,7 +44,7 @@
             MainGLControl.Name = "MainGLControl";
             MainGLControl.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
             MainGLControl.SharedContext = null;
-            MainGLControl.Size = new Size(800, 450);
+            MainGLControl.Size = new Size(1904, 1041);
             MainGLControl.TabIndex = 0;
             MainGLControl.Load += OnGLLoad;
             MainGLControl.Paint += OnGLPaint;
@@ -58,7 +58,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1904, 1041);
             Controls.Add(MainGLControl);
             KeyPreview = true;
             Name = "MainForm";

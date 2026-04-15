@@ -15,19 +15,19 @@ using XEngine.Core.Utils;
 
 namespace XEngine.Core.DebugUtils.Render
 {
-    public class DebugCapsuleRendererModule : RenderModule
+    public class DebugBoxRendererModule : RenderModule
     {
         public override int Priority => 100;
         private readonly IGLContext _context;
 
-        public DebugCapsuleRendererModule(IGLContext context)
+        public DebugBoxRendererModule(IGLContext context)
         {
             _context = context;
         }
 
         public override void Render(Scene scene)
         {
-            var shader = _context.GetShader("CapsuleDebug");
+            var shader = _context.GetShader("BoxDebug");
             shader.Use();
 
             shader.SetMatrix4("uProjection", _projection);
@@ -38,19 +38,17 @@ namespace XEngine.Core.DebugUtils.Render
 
             foreach (var (_, tr, cc) in scene.Query<TransformComp, Collider>())
             {
-                if (cc.Shape is not CapsuleCollider col) continue;
+                if (cc.Shape is not BoxCollider col) continue;
 
-                col.GetSegment(tr, out Segment seg);
-                shader.SetVector2("uPointA", seg.start);
-                shader.SetVector2("uPointB", seg.end);
-
-                shader.SetFloat("uRadius", col.Radius * tr.Scale.X);
+                shader.SetVector2("uCenter", tr.Position2D + col.Offset);
+                shader.SetVector2("uSize", col.HalfSize * tr.Scale);
+                shader.SetFloat("uAngle", tr.Rotation);
+                //shader.SetFloat("uAngle", 0);
 
                 Box2 aabbCalsule = col.GetBounds(tr);
-                Matrix4 modelMatrix =
-                    Matrix4.CreateScale(aabbCalsule.Size.X, aabbCalsule.Size.Y, 1.0f) *
-                    Matrix4.CreateTranslation(tr.Position2D.X, tr.Position2D.Y, 0.0f);
-                shader.SetMatrix4("uModel", modelMatrix);
+                Matrix4 assetMatrix = Matrix4.CreateScale(aabbCalsule.Size.X + 5, aabbCalsule.Size.Y + 5, 1.0f);
+                Matrix4 worldMatrix = Matrix4.CreateTranslation(tr.Position);
+                shader.SetMatrix4("uModel", assetMatrix * worldMatrix);
 
                 _context.UnitQuad.Draw();
             }

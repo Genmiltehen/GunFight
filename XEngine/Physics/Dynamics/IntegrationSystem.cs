@@ -7,9 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Base;
 using XEngine.Core.Common;
+using XEngine.Core.Physics.Components;
 using XEngine.Core.Scenery;
 
-namespace XEngine.Core.Physics.Systems
+namespace XEngine.Core.Physics.Dynamics
 {
     public class IntegrationSystem : IGameSystem
     {
@@ -24,18 +25,21 @@ namespace XEngine.Core.Physics.Systems
 
         public void Update(Scene _scene, float _dt)
         {
-            foreach (var (_, tr, rb) in _scene.Query<TransformComp, RigidbodyComp>())
+            foreach (var (_, tr, rb) in _scene.Query<TransformComp, Rigidbody>())
             {
-                if (rb.InvMass == 0) continue;
+                if (rb.IsStatic) continue;
 
-                Vector2 gravityForce = Gravity * rb.GravityScale * rb.Mass;
-                rb.AddForce(gravityForce);
+                if (rb.InvMass != 0)
+                {
+                    Vector2 gravityForce = Gravity * rb.GravityScale * rb.Mass;
+                    rb.AddForce(gravityForce);
+                }
 
                 SolveVerlet(tr, rb, _dt);
             }
         }
 
-        private static void SolveVerlet(TransformComp tr, RigidbodyComp rb, float dt)
+        private static void SolveVerlet(TransformComp tr, Rigidbody rb, float dt)
         {
             Vector2 acceleration = rb.FlushForce() * rb.InvMass;
             rb.Velocity += acceleration * dt;
@@ -46,6 +50,6 @@ namespace XEngine.Core.Physics.Systems
             rb.AngVelocity += angularAcc * dt;
             rb.AngVelocity *= rb.AngDrag;
             tr.Rotation += rb.AngVelocity * dt;
-        } 
+        }
     }
 }
