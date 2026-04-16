@@ -19,15 +19,13 @@ namespace XEngine.Core.Utils
             Vector2 vLeft = points[(index - 1 + points.Length) % points.Length];
             Vector2 vRight = points[(index + 1) % points.Length];
 
-            Vector2 l = (v - vLeft).Normalized();
-            Vector2 r = (v - vRight).Normalized();
-            return Vector2.Dot(r - l, normal) > 0 ? new() { start = vLeft, end = v } : new() { start = v, end = vRight };
+            return Vector2.Dot((v - vRight).Normalized() - (v - vLeft).Normalized(), normal) > 0 ? new(vLeft, v) : new(v, vRight);
         }
 
-        public static bool TestSAT(Vector2[] pointsA, Vector2[] pointsB, out Vector2 normal, out float depth)
+        public static bool TestSAT(Vector2[] pointsA, Vector2[] pointsB, out Vector2 normal)
         {
+            float minOverlap = float.MaxValue;
             normal = Vector2.Zero;
-            depth = float.MaxValue;
             IEnumerable<Vector2> allAxes = MathUtils.GetPolygonNormals(pointsA).Concat(MathUtils.GetPolygonNormals(pointsB));
 
             foreach (Vector2 axis in allAxes)
@@ -37,9 +35,9 @@ namespace XEngine.Core.Utils
                 if (minA > maxB || minB > maxA) return false;
 
                 float overlap = Math.Min(maxA, maxB) - Math.Max(minA, minB);
-                if (overlap < depth)
+                if (overlap < minOverlap)
                 {
-                    depth = overlap;
+                    minOverlap = overlap;
                     normal = axis;
                 }
             }
@@ -59,11 +57,7 @@ namespace XEngine.Core.Utils
 
             Vector2 intersect = seg.Lerp((dStart - offset) / (dStart - dEnd));
 
-            return new Segment()
-            {
-                start = dStart >= offset ? seg.start : intersect,
-                end = dEnd >= offset ? seg.end : intersect
-            };
+            return dStart >= offset ? new(seg.start, intersect) : new(intersect, seg.end);
         }
     }
 }

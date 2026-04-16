@@ -10,9 +10,7 @@ namespace XEngine.Core.Physics.MathStructs
         public CollisionObject coB;
 
         public Vector2 Normal; // A -> B
-        public ContactPoint contact1;
-        public ContactPoint contact2;
-        public int contactCount;
+        public ContactPoint[] contacts;
 
         public readonly float CalculateK_inv(ContactPoint PoC, Vector2 Direction, out float r_APerpN, out float r_BPerpN)
         {

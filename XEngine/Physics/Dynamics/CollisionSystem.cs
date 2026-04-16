@@ -14,13 +14,15 @@ namespace XEngine.Core.Physics.Dynamics
         public int Priority => 400;
         private readonly IBroadPhase _detector;
 
-        private const float BAUMGARTE_BETA = 0.2f;
+        private const float BAUMGARTE_BETA = 0.1f;
         private const float SLOP_FACTOR = 3f;
-        private const int ResolveCycles = 8;
+        private const int ResolveCycles = 20;
 
         // TODO: material component
-        private const float ELASTICITY = 0f;
-        private const float FRICTION_MU = 0.8f;
+        private const float ELASTICITY = 0.0f;
+        private const float FRICTION_MU = 1f;
+
+        private readonly HashSet<int> _resolve_ids = [];
 
         public CollisionSystem(IBroadPhase detector)
         {
@@ -29,23 +31,20 @@ namespace XEngine.Core.Physics.Dynamics
 
         public void Update(Scene _scene, float _dt)
         {
-            var manifolds = _detector.GetPotentialPairs(_scene);
+            var manifolds = _detector.GetPotentialPairs(_scene)
+                .Select(pair => CollisionMatrix.Check(pair.Item1, pair.Item2))
+                .Where(m => m.HasValue)
+                .Select(m => m.Value);
 
-            var ids = new HashSet<int>();
             for (int i = 0; i < ResolveCycles; i++)
             {
-                ids.Clear();
+                _resolve_ids.Clear();
                 foreach (var pair in _detector.GetPotentialPairs(_scene))
                 {
                     var m = CollisionMatrix.Check(pair.Item1, pair.Item2);
-                    if (m.HasValue)
-                    {
-                        ForceResolution(m.Value, _dt);
-                        ids.Add(m.Value.coA.entityId);
-                        ids.Add(m.Value.coB.entityId);
-                    }
+                    if (m.HasValue) ForceResolution(m.Value, _dt, _resolve_ids);
                 }
-                foreach (var e in _scene.IterateByIds(ids)) e.Get<Rigidbody>()!.FlushImpulse();
+                foreach (var e in _scene.IterateByIds(_resolve_ids)) e.Get<Rigidbody>()!.FlushImpulse();
             }
             for (int i = 0; i < ResolveCycles; i++)
                 foreach (var pair in _detector.GetPotentialPairs(_scene))
@@ -57,8 +56,7 @@ namespace XEngine.Core.Physics.Dynamics
 
         private static void OverlapResolution(CollisionManifold m)
         {
-            OverlapResolutionPerPoC(m, m.contact1);
-            if (m.contactCount > 1) OverlapResolutionPerPoC(m, m.contact2);
+            foreach (var poc in m.contacts) OverlapResolutionPerPoC(m, poc);
         }
 
         private static void OverlapResolutionPerPoC(CollisionManifold m, ContactPoint PoC)
@@ -78,10 +76,11 @@ namespace XEngine.Core.Physics.Dynamics
             b.tr.Rotation += lambda * rBperpN * b.rb.InvInertia;
         }
 
-        private static void ForceResolution(CollisionManifold m, float dt)
+        private static void ForceResolution(CollisionManifold m, float dt, HashSet<int> ids)
         {
-            ForceResolvePerPoC(m, m.contact1, dt);
-            if (m.contactCount > 1) ForceResolvePerPoC(m, m.contact2, dt);
+            ids.Add(m.coA.entityId);
+            ids.Add(m.coB.entityId);
+            foreach (var poc in m.contacts) ForceResolvePerPoC(m, poc, dt);
         }
 
         private static void ForceResolvePerPoC(CollisionManifold m, ContactPoint PoC, float dt)
@@ -91,7 +90,6 @@ namespace XEngine.Core.Physics.Dynamics
 
             Vector2 r_A = PoC.point - a.tr.Position2D;
             Vector2 r_B = PoC.point - b.tr.Position2D;
-            Vector2 tangent = MathUtils.LeftPerp(m.Normal);
             Vector2 v_rel = b.rb.TotalVelAtPoint(r_B) - a.rb.TotalVelAtPoint(r_A);
 
             float contactVelocity = Vector2.Dot(v_rel, m.Normal);
@@ -113,6 +111,7 @@ namespace XEngine.Core.Physics.Dynamics
             b.rb.ApplyImpulseAtPoint(r_B, J);
 
             // FRICTION
+            Vector2 tangent = MathUtils.LeftPerp(m.Normal);
             float v_rel_tan = Vector2.Dot(v_rel, tangent);
             float K_tangent = m.CalculateK_inv(PoC, tangent, out float _, out float _);
             float jt = -v_rel_tan / K_tangent;

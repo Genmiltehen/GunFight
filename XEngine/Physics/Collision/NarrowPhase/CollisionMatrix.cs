@@ -1,6 +1,8 @@
-﻿using OpenTK.Mathematics;
+﻿using Microsoft.VisualBasic;
+using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection.Emit;
 using XEngine.Core.Input.InputAxis;
 using XEngine.Core.Physics.Collision.Shapes;
@@ -22,7 +24,7 @@ namespace XEngine.Core.Physics.Collision.NarrowPhase
             _matrix = new CollisionChecker[count, count];
 
             Register(ColliderType.Box, ColliderType.Box, BoxBox);
-            //_generator.Register(ColliderType.Box, ColliderType.Capsule, BoxCapsule);
+            Register(ColliderType.Box, ColliderType.Capsule, BoxCapsule);
             Register(ColliderType.Capsule, ColliderType.Capsule, CapsuleCapsule);
         }
 
@@ -64,7 +66,7 @@ namespace XEngine.Core.Physics.Collision.NarrowPhase
             var pointsA = boxA.GetCorners(a.tr);
             var pointsB = boxB.GetCorners(b.tr);
 
-            if (!SATMethod.TestSAT(pointsA, pointsB, out Vector2 normal, out float depth)) return null;
+            if (!SATMethod.TestSAT(pointsA, pointsB, out Vector2 normal)) return null;
 
             Segment refEdge = SATMethod.GetBestEdge(pointsA, normal);
             Segment incEdge = SATMethod.GetBestEdge(pointsB, -normal);
@@ -84,93 +86,133 @@ namespace XEngine.Core.Physics.Collision.NarrowPhase
             float offsetEnd = Vector2.Dot(refDir, refEdge.end);
             clipped = SATMethod.Clip(clipped.Value, -refDir, -offsetEnd);
             if (!clipped.HasValue) return null;
-            var def_clipped = clipped.Value;    
+            var def_clipped = clipped.Value;
 
             Vector2 refNormal = MathUtils.PerpTowards(refDir, flipped ? -normal : normal);
             float maxDepthOffset = Vector2.Dot(refNormal, refEdge.start);
             CollisionManifold manifold = new() { coA = a, coB = b, Normal = normal };
 
+            List<ContactPoint> res = [];
+
             float d1 = Vector2.Dot(refNormal, def_clipped.start) - maxDepthOffset;
-            if (d1 <= 0)
-            {
-                manifold.contact1 = new ContactPoint { point = def_clipped.start, depth = -d1 };
-                manifold.contactCount++;
-            }
+            if (d1 <= 0) res.Add(new ContactPoint { point = def_clipped.start, depth = -d1 });
 
             float d2 = Vector2.Dot(refNormal, def_clipped.end) - maxDepthOffset;
-            if (d2 <= 0)
-            {
-                ContactPoint cp = new() { point = def_clipped.end, depth = -d2 };
-                if (manifold.contactCount == 0)
-                    manifold.contact1 = cp;
-                else
-                    manifold.contact2 = cp;
-                manifold.contactCount++;
-            }
+            if (d2 <= 0) res.Add(new() { point = def_clipped.end, depth = -d2 });
 
-            return manifold.contactCount > 0 ? manifold : null;
+            manifold.contacts = [.. res];
+            return res.Count == 0 ? null : manifold;
         }
 
-        private const float PARALLEL_THRESHOLD = 0.99999f;
+        private static CollisionManifold? BoxCapsule(CollisionObject cap, CollisionObject box)
+        {
+            CapsuleCollider cap_col;
+            BoxCollider box_col;
+            if (cap.col.Shape is CapsuleCollider cc1 && box.col.Shape is BoxCollider cc2)
+            {
+                cap_col = cc1;
+                box_col = cc2;
+            }
+            else if (cap.col.Shape is BoxCollider cc3 && box.col.Shape is CapsuleCollider cc4)
+            {
+                cap_col = cc4;
+                box_col = cc3;
+                (cap, box) = (box, cap);
+            }
+            else return null;
+
+            var cap_seg = cap_col.GetSegment(cap.tr);
+            Vector2 box_c = box.tr.Position2D;
+            Vector2 segPoint = MathUtils.LineProjectionClipped(box_c, cap_seg);
+            Vector2 axis, delta = segPoint - box_c;
+            MathUtils.CalcAxes(box.tr.Rotation, out Vector2 axisX, out Vector2 axisY);
+            axisX = MathUtils.FlipTowards(axisX, delta);
+            axisY = MathUtils.FlipTowards(axisY, delta);
+            float distX = Vector2.Dot(delta, axisX) - box_col.HalfSize.X;
+            float distY = Vector2.Dot(delta, axisY) - box_col.HalfSize.Y;
+            if (distX <= 0.0f) axis = axisY;
+            else if (distY <= 0.0f) axis = axisX;
+            else axis = MathF.Abs(distX) < MathF.Abs(distY) ? axisX : axisY;
+            var box_seg = SATMethod.GetBestEdge(box_col.GetCorners(box.tr), axis);
+
+            // normal: box -> cap
+            var contacts = GetCapsuleContactPoints(box_seg, 0, cap_seg, cap_col.Radius, out Vector2 normal);
+
+            return contacts.Length == 0 ? null : new()
+            {
+                coA = box,
+                coB = cap,
+                Normal = normal,
+                contacts = contacts,
+            };
+        }
+
         private static CollisionManifold? CapsuleCapsule(CollisionObject a, CollisionObject b)
         {
             if (a.col.Shape is not CapsuleCollider cp1) return null;
             if (b.col.Shape is not CapsuleCollider cp2) return null;
-            cp1!.GetSegment(a.tr, out Segment seg1);
-            cp2!.GetSegment(b.tr, out Segment seg2);
+            Segment seg1 = cp1!.GetSegment(a.tr);
+            Segment seg2 = cp2!.GetSegment(b.tr);
 
-            float sumR = cp1.Radius + cp2.Radius;
-            float deltaR_2 = (cp1.Radius - cp2.Radius) / 2;
+            var contacts = GetCapsuleContactPoints(seg1, cp1.Radius, seg2, cp2.Radius, out Vector2 normal);
+            return contacts.Length == 0 ? null : new()
+            {
+                coA = a,
+                coB = b,
+                Normal = normal,
+                contacts = contacts,
+            };
+        }
 
-            Vector2 normal;
+        private const float PARALLEL_THRESHOLD = 0.99999f;
+        private static ContactPoint[] GetCapsuleContactPoints(Segment seg1, float R1, Segment seg2, float R2, out Vector2 normal)
+        {
+            normal = Vector2.UnitY;
+            float sumR = R1 + R2;
+            float depth, len;
+
             Vector2 axis1 = seg1.Direction;
             Vector2 axis2 = seg2.Direction;
 
             MathUtils.ClosestPointsBetweenSegments(seg1, seg2, out Vector2 p1, out Vector2 p2);
             float dist = (p2 - p1).Length;
-            if (dist >= sumR) return null;
+            if (dist >= sumR) return [];
 
             if (MathF.Abs(Vector2.Dot(axis1, axis2)) > PARALLEL_THRESHOLD)
             {
-                MathUtils.PolygonProjectionBounds(axis1, seg1.AsArray(), out float min1, out float max1);
+                MathUtils.PolygonProjectionBounds(axis1, seg1.AsArray(), out float min1, out _);
                 MathUtils.PolygonProjectionBounds(axis1, seg2.AsArray(), out float min2, out float max2);
-                Vector2 translation = MathUtils.DirFromLineToPoint(seg2.start, seg1.start, axis1);
+                Vector2 translation = seg2.start - MathUtils.LineProjection(seg2.start, seg1);
                 float LT = translation.Length;
-                float depth = sumR - LT;
-                if (depth <= 0) return null;
 
-                float Min = MathF.Max(min1, min2);
-                float Max = MathF.Min(max1, max2);
+                //Debug.WriteLine($"{translation} {seg2.start} {MathUtils.SnapToLine(seg2.start, seg1)}");
+
+                depth = sumR - LT;
+                if (depth <= 0) return [];
+
+                max2 = (max2 - min1) / seg1.Length;
+                min2 = (min2 - min1) / seg1.Length;
+                float Min = MathF.Max(0, min2);
+                float Max = MathF.Min(1, max2);
 
                 if (Max > Min)
                 {
-                    float len = deltaR_2 + LT / 2;
+                    len = R2;
                     normal = translation.Normalized();
-                    Vector2 pointL = a.tr.Position2D + axis1 * Min + normal * len;
-                    Vector2 pointR = a.tr.Position2D + axis1 * Max + normal * len;
+                    Vector2 pointL = seg1.Lerp(Min) - normal * len;
+                    Vector2 pointR = seg1.Lerp(Max) - normal * len;
 
-                    return new CollisionManifold
-                    {
-                        coA = a,
-                        coB = b,
-                        Normal = normal,
-                        contact1 = new() { point = pointL, depth = depth },
-                        contact2 = new() { point = pointR, depth = depth },
-                        contactCount = 2
-                    };
+                    return [
+                        new() { point = pointL, depth = depth },
+                        new() { point = pointR, depth = depth },
+                    ];
                 }
             }
 
+            depth = sumR - dist;
+            len = R1 - depth / 2;
             normal = dist > 0 ? (p2 - p1) / dist : Vector2.UnitY;
-            return new CollisionManifold
-            {
-                coA = a,
-                coB = b,
-                Normal = normal,
-                contact1 = new() { point = (p1 + p2) / 2 + normal * deltaR_2, depth = sumR - dist },
-                contactCount = 1
-            };
-
+            return [new() { point = p1 + normal * len, depth = depth }];
         }
     }
 }

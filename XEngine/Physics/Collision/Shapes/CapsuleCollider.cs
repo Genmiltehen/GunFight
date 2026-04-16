@@ -34,7 +34,7 @@ namespace XEngine.Core.Physics.Collision.Shapes
 
         public Box2 GetBounds(TransformComp tr)
         {
-            GetSegment(tr, out Segment seg);
+            Segment seg = GetSegment(tr);
             return new Box2(seg.start, seg.end).Inflated(new Vector2(_r, _r));
         }
 
@@ -55,21 +55,17 @@ namespace XEngine.Core.Physics.Collision.Shapes
             }
         }
 
-        public void GetSegment(TransformComp tr, out Segment segment)
+        public Segment GetSegment(TransformComp tr)
         {
             if (_isDirty)
             {
                 Vector2 center = tr.Position2D + Offset;
                 var (sin, cos) = MathF.SinCos(tr.Rotation);
                 Vector2 dir = new(cos, sin);
-                _cache_seg = new()
-                {
-                    start = center - dir * _hl,
-                    end = center + dir * _hl
-                };
+                _cache_seg = new(center - dir * _hl, center + dir * _hl);
                 _isDirty = false;
             }
-            segment = _cache_seg;
+            return _cache_seg;
         }
 
         public void SetDirty()

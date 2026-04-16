@@ -40,7 +40,7 @@ namespace XEngine.Core.DebugUtils.Render
             {
                 if (cc.Shape is not CapsuleCollider col) continue;
 
-                col.GetSegment(tr, out Segment seg);
+                Segment seg = col.GetSegment(tr);
                 shader.SetVector2("uPointA", seg.start);
                 shader.SetVector2("uPointB", seg.end);
 

@@ -47,19 +47,6 @@ namespace XEngine.Core.Physics.Collision.Shapes
             return _cache_points;
         }
 
-        public void GetProjection(Vector2 axis, TransformComp tr, out float min, out float max)
-        {
-            Vector2[] corners = GetCorners(tr);
-            MathUtils.PolygonProjectionBounds(axis, corners, out min, out max);
-        }
-
-        public static void CalcAxes(TransformComp tr, out Vector2 axis1, out Vector2 axis2)
-        {
-            var (cos, sin) = MathF.SinCos(tr.Rotation);
-            axis1 = new Vector2(cos, sin);
-            axis2 = new Vector2(-sin, cos);
-        }
-
         public float UnitMassMoI => Vector2.Dot(Size, Size) / 12;
 
         // Optimizations

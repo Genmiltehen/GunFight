@@ -1,4 +1,6 @@
 ﻿using OpenTK.Mathematics;
+using System.Diagnostics;
+using XEngine.Core.Input.InputAxis;
 
 namespace XEngine.Core.Utils
 {
@@ -26,6 +28,18 @@ namespace XEngine.Core.Utils
             Vector2 res = new(v.Y, -v.X);
             if (Vector2.Dot(res, normal) < 0) res = -res;
             return res;
+        }
+
+        public static Vector2 FlipTowards(Vector2 v, Vector2 direction)
+        {
+            return Vector2.Dot(direction, v) >= 0 ? v : -v;
+        }
+
+        public static void CalcAxes(float rotation, out Vector2 axis1, out Vector2 axis2)
+        {
+            var (sin, cos) = MathF.SinCos(rotation);
+            axis1 = new Vector2(cos, sin);
+            axis2 = new Vector2(-sin, cos);
         }
 
         public static bool Box2Intersect(Box2 a, Box2 b)
@@ -85,11 +99,14 @@ namespace XEngine.Core.Utils
             closestPoint2 = seg2.Lerp(t);
         }
 
-        public static Vector2 DirFromLineToPoint(Vector2 p, Vector2 origin, Vector2 dir)
+        public static Vector2 LineProjection(Vector2 p, Segment line)
         {
-            Vector2 p_prime = p - origin;
-            float h = Vector2.Dot(p_prime, dir);
-            return p_prime - dir * h;
+            return line.start + Vector2.Dot(p - line.start, line.Direction) * line.Direction;
+        }
+
+        public static Vector2 LineProjectionClipped(Vector2 p, Segment seg)
+        {
+            return seg.ClampLerp(Vector2.Dot(p - seg.start, seg.Direction) / seg.Length);
         }
 
         public static void PolygonProjectionBounds(Vector2 axis, Vector2[] points, out float min, out float max)
