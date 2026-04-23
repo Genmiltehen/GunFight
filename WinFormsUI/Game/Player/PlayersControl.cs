@@ -9,13 +9,10 @@ namespace WinFormsUI.Game.Player
 {
     internal class PlayersControl(IInputService input) : InputSystem(input)
     {
-        private float playerTopSpeed = 5;
-        private float playerAccel = 30;
-
         public override void Update(GScene _scene, float _dt)
         {
-            var (eA, playerA) = _scene.Query<GPlayer>(e => e.Has<PlayerATag>()).FirstOrDefault();
-            playerA.ProcessInput(_scene, _dt);
+            foreach (var (_, player) in _scene.Query<GPlayer>())
+                player.ProcessInput(_scene, _dt);
         }
     }
 }

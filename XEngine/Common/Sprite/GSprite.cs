@@ -12,6 +12,7 @@ namespace XEngine.Core.Common.Sprite
         private Matrix4 _scale = Matrix4.Identity;
         private Matrix4 _tr = Matrix4.Identity;
         private bool _useTextureScale = false;
+        private float _textureScale = 1;
 
         public GSprite SetTexture(Texture2D texture, bool _useTextureScale)
         {
@@ -42,17 +43,16 @@ namespace XEngine.Core.Common.Sprite
             return this;
         }
 
-        public GSprite SetScale(float scale)
+        public GSprite SetSourceTextureScale(float scale)
         {
-            _scale = Matrix4.CreateScale(scale, scale, 1);
-            Recalculate();
+            _textureScale = scale;
             return this;
         }
 
         private void Recalculate()
         {
             var _texScale = _useTextureScale && Texture != null
-                ? Matrix4.CreateScale(Texture.Width, Texture.Height, 1)
+                ? Matrix4.CreateScale(Texture.Width * _textureScale, Texture.Height * _textureScale, 1)
                 : Matrix4.Identity;
             _tr = _texScale * _scale * _rotation * _translation;
         }

@@ -37,7 +37,6 @@ namespace XEngine.Core.Input
 
         public float GetAxis(string axisName) => _axes.TryGetValue(axisName, out var a) ? a.Value : 0f;
 
-
         // --- Config ---
         public void LoadBindingsFromConfig(GameConfig config)
         {

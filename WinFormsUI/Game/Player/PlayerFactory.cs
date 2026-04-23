@@ -27,7 +27,7 @@ namespace WinFormsUI.Game.Player
             var e = scene.CreateEntity();
             var tr = e.AddComponent<GTransform>().Init(new(0, 10, 0), 0f);
             e.AddComponent<GSprite>()
-                .SetScale(1.0f / scene.World.PixelPerMetre)
+                .SetSourceTextureScale(1.0f / scene.World.PixelPerMetre)
                 .SetTranslation(new(0, size.Y * 0.5f));
 
             float r = 0.5f * size.X;
@@ -45,7 +45,6 @@ namespace WinFormsUI.Game.Player
                     capsuleDef.material.friction = 0.1f;
                     capsuleDef.filter.categoryBits = (ulong)CollisionFlags.PLAYER;
                     capsuleDef.filter.maskBits = (ulong)(CollisionFlags.PLAYER | CollisionFlags.GROUND);
-                    //capsuleDef.filter.categoryBits = (ulong)CollisionFlags.PLAYER;
                     B2Shapes.b2CreateCapsuleShape(bid, capsuleDef, capsule);
                 }).AttacShapes(bid => // -- circle sensor for ground collision --
                 {
@@ -54,8 +53,7 @@ namespace WinFormsUI.Game.Player
                     circleSensorDef.enableSensorEvents = true;
                     circleSensorDef.filter.categoryBits = (ulong)CollisionFlags.FOOT;
                     circleSensorDef.filter.maskBits = (ulong)CollisionFlags.GROUND;
-                    var s = B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, r * 0.8f), r));
-                    var a = B2Bodies.b2Body_GetTransform(B2Shapes.b2Shape_GetBody(s));
+                    B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, r * 0.8f), r));
                 });
             B2Bodies.b2Body_SetUserData(bodyComp.Id, B2UserData.Ref(new PlayerUserData()));
             return e;
@@ -66,7 +64,7 @@ namespace WinFormsUI.Game.Player
             var e = scene.CreateEntity();
             e.AddComponent<GTransform>().Init(new(0, size.Y, 0), 0f);
             e.AddComponent<GSprite>()
-                .SetScale(1.0f / scene.World.PixelPerMetre);
+                .SetSourceTextureScale(1.0f / scene.World.PixelPerMetre);
             return e;
         }
 
@@ -75,7 +73,7 @@ namespace WinFormsUI.Game.Player
             var e = scene.CreateEntity();
             e.AddComponent<GTransform>().Init(new(0, size.Y * 0.6f, 0), 0f);
             e.AddComponent<GSprite>()
-                .SetScale(1.0f / scene.World.PixelPerMetre)
+                .SetSourceTextureScale(1.0f / scene.World.PixelPerMetre)
                 .SetTranslation(new(size.X * 0.25f, 0));
             return e;
         }

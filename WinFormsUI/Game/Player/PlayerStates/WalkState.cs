@@ -21,18 +21,27 @@ namespace WinFormsUI.Game.Player.PlayerStates
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            if (!player.IsOnGround()) player.SwitchTo<AirborneState>();
-
-            var hor = player.HorizontalInput(scene.Input);
-            if (hor == 0) player.SwitchTo<IdleState>();
-
             var b2body = player.Owner.Get<GBox2DBody>()!;
             var jumped = scene.Input.IsActionJustActivated($"jump{player.Name}");
-            if (jumped) B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(0, 20), true);
+            if (jumped) B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(0, player.JumpPower), true);
+
+            if (!player.IsOnGround())
+            {
+                player.SwitchTo<AirborneState>();
+                return;
+            }
+
+            var hor = player.HorizontalInput(scene.Input);
+            if (hor == 0)
+            {
+                player.SwitchTo<IdleState>();
+                return;
+            }
 
             var vel = B2Bodies.b2Body_GetLinearVelocity(b2body.Id);
             var delta = Box2DMathUtils.MoveToward(vel.X, player.TopSpeed * hor, player.Acceleration * dt) - vel.X;
             B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(delta, 0), true);
+            player.SetFacing(new(hor, 0));
         }
     }
 }

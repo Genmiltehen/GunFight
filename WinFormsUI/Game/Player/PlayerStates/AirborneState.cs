@@ -26,13 +26,18 @@ namespace WinFormsUI.Game.Player.PlayerStates
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            if (player.IsOnGround()) player.SwitchTo<IdleState>();
+            if (player.IsOnGround())
+            {
+                player.SwitchTo<IdleState>();
+                return;
+            }
 
             var hor = player.HorizontalInput(scene.Input);
             var b2body = player.Owner.Get<GBox2DBody>()!;
             var vel = B2Bodies.b2Body_GetLinearVelocity(b2body.Id);
             var delta = Box2DMathUtils.MoveToward(vel.X, player.TopSpeed * hor, player.Acceleration * dt) - vel.X;
             B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(delta * 0.5f, 0), true);
+            if (hor != 0) player.SetFacing(new(hor, 0));
         }
     }
 }

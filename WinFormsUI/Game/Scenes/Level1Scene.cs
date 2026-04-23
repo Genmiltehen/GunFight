@@ -27,11 +27,17 @@ namespace WinFormsUI.Game.Scenes
 
             B2Vec2 charSize = new(1, 1.5f);
 
-            var player = PlayerFactory.CreatePlayer(this, charSize);
-            player.Owner.AddComponent<PlayerATag>();
-            player.SetCharacterTeaxtures(Assets, "God");
-            player.SetWeaponTexture(Assets, "Gun");
-            player.Name = "A";
+            var playerA = PlayerFactory.CreatePlayer(this, charSize);
+            playerA.SetCharacterTeaxtures(Assets, "God");
+            playerA.SetWeaponTexture(Assets, "Gun");
+            playerA.Name = "A";
+            playerA.SetFacing(new(-1, 0));
+
+            var playerB = PlayerFactory.CreatePlayer(this, charSize);
+            playerB.SetCharacterTeaxtures(Assets, "God");
+            playerB.SetWeaponTexture(Assets, "Gun");
+            playerB.Name = "B";
+            playerB.SetFacing(new(-1, 0));
         }
     }
 }

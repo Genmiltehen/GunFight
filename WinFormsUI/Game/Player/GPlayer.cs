@@ -21,6 +21,7 @@ namespace WinFormsUI.Game.Player
         // TODO: Вынос в компонент PlayerStats
         public float TopSpeed = 5;
         public float Acceleration = 30;
+        public float JumpPower = 30;
 
         public string Name = "";
 
@@ -29,6 +30,7 @@ namespace WinFormsUI.Game.Player
         public Entity WeaponEntity;
 
         private IPlayerState? _state;
+        private bool _isRight = true;
 
         public GPlayer Init(Entity body, Entity head, Entity weapon)
         {
@@ -48,6 +50,22 @@ namespace WinFormsUI.Game.Player
         public float HorizontalInput(IInputService input)
         {
             return input.GetAxis($"Horizontal{Name}");
+        }
+
+        public void SetFacing(B2Vec2 dir)
+        {
+            float angle = B2MathFunction.b2Atan2(dir.Y, dir.X);
+            HeadEntity.Get<GTransform>()!.Rotation = angle;
+            WeaponEntity.Get<GTransform>()!.Rotation = angle;
+
+            if (_isRight != dir.X > 0)
+            {
+                _isRight = dir.X > 0;
+                float flip = _isRight ? 1 : -1;
+                BodyEntity.Get<GSprite>()!.SetScale(new(flip, 1));
+                HeadEntity.Get<GSprite>()!.SetScale(new(1, flip));
+                WeaponEntity.Get<GSprite>()!.SetScale(new(1, flip));
+            }
         }
 
         public void SwitchTo<T>() where T : IPlayerState, new()
