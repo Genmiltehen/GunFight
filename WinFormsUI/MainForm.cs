@@ -1,7 +1,9 @@
+using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
 using System.Diagnostics;
 using WinFormsUI.Game;
 using WinFormsUI.Game.Input;
+using WinFormsUI.Game.Scenes;
 using XEngine.Core;
 using XEngine.Core.Graphics.OpenGL;
 
@@ -24,6 +26,8 @@ namespace WinFormsUI
 
             string assetsPath = Path.Combine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight", "Assets");
             _engine = new GameEngine(assetsPath);
+
+            this.KeyPreview = true;
         }
 
         private void MainFormLoad(object sender, EventArgs e)
@@ -33,12 +37,13 @@ namespace WinFormsUI
             int height = ClientSize.Height;
             _engine.Renderer.SetViewport(width, height);
 
-            _engine.SceneManager.SwitchTo(new TestScene(_engine));
+            _engine.SceneManager.SwitchTo(new Level1Scene(_engine));
 
             _stopwatch.Start();
             MainTimer.Start();
 
             Activate();
+            Focus();
         }
 
         private void OnGLLoad(object sender, EventArgs e)
@@ -48,18 +53,16 @@ namespace WinFormsUI
             GL.DepthFunc(DepthFunction.Lequal);
             GL.ClearColor(Color.Black);
 
+            MainGLControl.Enabled = false;
             _engine.Init();
-
-            var debugShaderFolder = Path.Combine(_engine.Assets.ShaderPath, "Debuging");
-            _engine.Assets.SetShader("CapsuleDebug", Shader.FromFolder(Path.Combine(debugShaderFolder, "Capsule")));
-            _engine.Assets.SetShader("BoxDebug", Shader.FromFolder(Path.Combine(debugShaderFolder, "Box")));
         }
 
         private void OnGLPaint(object sender, PaintEventArgs e)
         {
-            MainGLControl.MakeCurrent();
+            var _gl = (GLControl)sender;
+            _gl.MakeCurrent();
             _engine.Render();
-            MainGLControl.SwapBuffers();
+            _gl.SwapBuffers();
         }
 
         private void TimerTick(object sender, EventArgs e)
@@ -88,7 +91,7 @@ namespace WinFormsUI
 
         private void OnClose(object sender, FormClosingEventArgs e)
         {
-            _engine.Assets.Dispose();
+            _engine.Dispose();
         }
 
         private void MainForm_OnKeyDown(object sender, KeyEventArgs e) => _engine.Input.SetKeyDown(KeyConverter.ToOpenTK(e.KeyCode));

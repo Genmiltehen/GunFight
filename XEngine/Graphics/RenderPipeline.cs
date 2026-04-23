@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
+using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;
 
 
@@ -11,7 +12,7 @@ namespace XEngine.Core.Graphics
         public void AddRenderModule(RenderModule renderModule)
         {
             _renderModules.Add(renderModule);
-            _renderModules.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+            _renderModules.Sort((a, b) => b.Priority.CompareTo(a.Priority)); // inverted: 0 - top, 500 - bottom
         }
 
         public void SetViewport(int width, int height)
@@ -20,7 +21,7 @@ namespace XEngine.Core.Graphics
             foreach (var _r in _renderModules) _r.OnResize(width, height);
         }
 
-        public void Render(Scene scene)
+        public void Render(GScene scene)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             foreach (var _r in _renderModules) if (_r.IsEnabled) _r.Render(scene);

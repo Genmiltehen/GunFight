@@ -16,7 +16,7 @@ namespace XEngine.Core.Input.InputAxis
         public float Sensitivity = settings.Sensitivity;
         public float Value { get; private set; } = 0;
 
-        public void Update(InputService input, float dt)
+        public void Update(InputManager input, float dt)
         {
             float target = 0;
             float current = Value;

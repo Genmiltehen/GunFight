@@ -64,14 +64,12 @@ namespace XEngine.Core.Graphics.OpenGL
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposed)
-            {
-                GL.DeleteBuffer(_vbo);
-                GL.DeleteBuffer(_ebo);
-                GL.DeleteVertexArray(_vao);
+            if (_disposed) return;
+            _disposed = true;
 
-                _disposed = true;
-            }
+            GL.DeleteBuffer(_vbo);
+            GL.DeleteBuffer(_ebo);
+            GL.DeleteVertexArray(_vao);
         }
     }
 }

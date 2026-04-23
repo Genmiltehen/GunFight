@@ -3,10 +3,11 @@ using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Input
 {
-    public abstract class InputSystem(InputService input) : IGameSystem
+    public abstract class InputSystem(IInputService input) : IGameSystem
     {
-        protected readonly InputService input = input;
+        protected readonly IInputService input = input;
         public int Priority => 100;
-        public abstract void Update(Scene _scene, float _dt);
+        public bool IsEnabled { get; set; } = true;
+        public abstract void Update(GScene _scene, float _dt);
     }
 }

@@ -1,29 +1,39 @@
 {
 	"other": [],
 	"keymap": {
-		"up": "W",
-		"down": "S",
-		"left": "A",
-		"right": "D",
-		"cw": "Q",
-		"ccw": "E"
+		"jumpA": "W",
+		"sitA": "S",
+		"leftA": "A",
+		"rightA": "D",
+		"shootA": "LeftShift",
+		"jumpB": "I",
+		"sitB": "K",
+		"leftB": "J",
+		"rightB": "L",
+		"shootB": "Insert"
 	},
 	"axes": {
-		"Horzontal": {
-			"positive": "right",
-			"negative": "left",
+		"HorizontalA": {
+			"positive": "rightA",
+			"negative": "leftA",
 			"sensitivity": 10,
 			"gravity": 10
 		},
-		"Vertical": {
-			"positive": "up",
-			"negative": "down",
+		"VerticalA": {
+			"positive": "jumpA",
+			"negative": "sitA",
 			"sensitivity": 10,
 			"gravity": 10
 		},
-		"Rotato": {
-			"positive": "cw",
-			"negative": "ccw",
+		"HorizontalB": {
+			"positive": "rightB",
+			"negative": "leftB",
+			"sensitivity": 10,
+			"gravity": 10
+		},
+		"VerticalB": {
+			"positive": "jumpB",
+			"negative": "sitB",
 			"sensitivity": 10,
 			"gravity": 10
 		}

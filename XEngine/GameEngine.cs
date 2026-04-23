@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using OpenTK.Windowing.Desktop;
+using System.IO;
 using System.Text.Json;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Config;
@@ -10,26 +11,30 @@ using XEngine.Core.Scenery;
 
 namespace XEngine.Core
 {
-    public class GameEngine
+    public sealed class GameEngine : IDisposable
     {
         private readonly AssetManager _assets;
         private readonly SceneManager _sceneManager;
         private readonly RenderPipeline _renderPipeline;
-        private readonly InputService _input;
+        private readonly InputManager _input;
+        private readonly GLProvider _glProvider;
+
+        private bool _disposed = false;
 
         public AssetManager Assets => _assets;
         public SceneManager SceneManager => _sceneManager;
         public RenderPipeline Renderer => _renderPipeline;
-        public InputService Input => _input;
+        public InputManager Input => _input;
 
         public GameConfig _config;
 
         public GameEngine(string AssetPath)
         {
             _assets = new AssetManager(AssetPath);
+            _glProvider = new GLProvider(Path.Combine(AssetPath, "Shaders"));
             _sceneManager = new SceneManager(_assets);
             _renderPipeline = new RenderPipeline();
-            _input = new InputService();
+            _input = new InputManager();
             _config = new ConfigManager().Load(Path.Combine(AssetPath, "config.json"));
         }
 
@@ -37,14 +42,13 @@ namespace XEngine.Core
         {
             _assets.Init();
 
-            var spriteRenderer = new SpriteRendererModule(_assets);
+            _glProvider.Init();
+            _glProvider.LoadShader("Line", "Line");
+
+            var spriteRenderer = new SpriteRendererModule(_glProvider);
+            var debugRenderer = new Box2DBodyRender(_glProvider);
             _renderPipeline.AddRenderModule(spriteRenderer);
-
-            var debugCapsuleRenderer = new DebugCapsuleRendererModule(_assets);
-            _renderPipeline.AddRenderModule(debugCapsuleRenderer);
-
-            var debugBoxRenderer = new DebugBoxRendererModule(_assets);
-            _renderPipeline.AddRenderModule(debugBoxRenderer);
+            _renderPipeline.AddRenderModule(debugRenderer);
 
             _input.LoadBindingsFromConfig(_config);
         }
@@ -58,6 +62,15 @@ namespace XEngine.Core
         public void Render()
         {
             if (_sceneManager.CurrentScene != null) _renderPipeline.Render(_sceneManager.CurrentScene);
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            _sceneManager.Dispose();
+            _assets.Dispose();
         }
     }
 }

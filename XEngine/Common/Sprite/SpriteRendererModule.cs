@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using XEngine.Core.Graphics;
+using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Common.Sprite
@@ -8,40 +9,41 @@ namespace XEngine.Core.Common.Sprite
     public class SpriteRendererModule : RenderModule
     {
         public override int Priority => 500;
-        private readonly IGLContext _context;
+        private readonly GLProvider _provider;
+        private readonly Shader _spriteShader;
 
-        public SpriteRendererModule(IGLContext context)
+        public SpriteRendererModule(GLProvider provider)
         {
-            _context = context;
+            _provider = provider;
+            _spriteShader = _provider.GetShader("Sprite");
         }
 
-        public override void Render(Scene scene)
+        public override void Render(GScene scene)
         {
             if (!ValidateDraw(scene)) return;
 
-            var shader = _context.GetShader("Sprite");
-            shader.Use();
+            _spriteShader.Use();
+            _spriteShader.SetMatrix4("uProjection", _projection);
 
-            shader.SetMatrix4("uProjection", _projection);
-            shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
-            shader.SetInt("uTexture", 0);
+            _spriteShader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
+            _spriteShader.SetInt("uTexture", 0);
             GL.ActiveTexture(TextureUnit.Texture0);
 
-            _context.UnitQuad.Bind();
-            foreach (var (_, transform, sprite) in scene.Query<TransformComp, SpriteComp>())
+            _provider.UnitQuad.Bind();
+            foreach (var (_, tr, sprite) in scene.Query<GTransform, GSprite>())
             {
                 sprite.Texture.Use();
 
-                var modelMatrix = sprite.GetAssetScale() * transform.GetWorldMatrix();
-                shader.SetMatrix4("uModel", modelMatrix);
+                var modelMatrix = sprite.GetAssetScale() * tr.GetWorldMatrix();
+                _spriteShader.SetMatrix4("uModel", modelMatrix);
 
-                _context.UnitQuad.Draw();
+                _provider.UnitQuad.Draw();
             }
 
             GL.BindVertexArray(0);
         }
 
-        private bool ValidateDraw(Scene _scene)
+        private bool ValidateDraw(GScene _scene)
         {
             return !(_screenWidth <= 0 || _screenHeight <= 0);
         }

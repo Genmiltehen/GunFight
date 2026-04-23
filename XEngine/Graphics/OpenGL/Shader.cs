@@ -156,12 +156,11 @@ namespace XEngine.Core.Graphics.OpenGL
         private void Dispose(bool _disposing)
         {
             if (_disposed) return;
+            _disposed = true;
 
             if (_currentBoundHandle == Handle)
                 _currentBoundHandle = -1;
-
             GL.DeleteProgram(Handle);
-            _disposed = true;
         }
 
         ~Shader() => Dispose(false);

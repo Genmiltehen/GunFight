@@ -2,5 +2,6 @@
 
 namespace WinFormsUI.Game
 {
-    public class PlayerTag : GameComponent { }
+    public class PlayerATag : GameComponent { }
+    public class PlayerBTag : GameComponent { }
 }

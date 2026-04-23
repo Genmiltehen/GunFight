@@ -40,6 +40,10 @@ namespace WinFormsUI.Game.Input
             { WinKeys.Down, OtkKeys.Down },
             { WinKeys.Left, OtkKeys.Left },
             { WinKeys.Right, OtkKeys.Right },
+
+            { WinKeys.ShiftKey, OtkKeys.LeftShift },
+            { WinKeys.Insert, OtkKeys.Insert },
+            { WinKeys.Control, OtkKeys.LeftControl },
         };
 
         public static OtkKeys ToOpenTK(WinKeys winKey)

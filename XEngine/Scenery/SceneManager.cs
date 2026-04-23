@@ -1,18 +1,19 @@
-﻿using XEngine.Core.Graphics.OpenGL;
+﻿using XEngine.Core.Graphics;
 
 namespace XEngine.Core.Scenery
 {
-    public sealed class SceneManager
+    public sealed class SceneManager : IDisposable
     {
         private readonly AssetManager _assets;
-        public Scene? CurrentScene { get; private set; }
+        private bool _disposed = false;
+        public GScene? CurrentScene { get; private set; }
 
         public SceneManager(AssetManager assets)
         {
             _assets = assets;
         }
 
-        public void SwitchTo(Scene newScene)
+        public void SwitchTo(GScene newScene)
         {
             CurrentScene?.Unload();
             _assets.UnloadSceneAssets();
@@ -24,6 +25,14 @@ namespace XEngine.Core.Scenery
         public void Update(float dt)
         {
             CurrentScene?.Update(dt);
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            CurrentScene?.Unload();
         }
     }
 }

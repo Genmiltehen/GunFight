@@ -12,7 +12,7 @@ namespace XEngine.Core.Graphics
         public bool IsEnabled { get; set; } = true;
         public abstract int Priority { get; }
 
-        public abstract void Render(Scene scene);
+        public abstract void Render(GScene scene);
         public void OnResize(int width, int height)
         {
             _screenWidth = width;
