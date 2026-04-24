@@ -35,14 +35,14 @@ namespace XEngine.Core.Graphics.OpenGL
 
             Debug.WriteLine($"[Error] Shader '{name}' not found. Falling back to ErrorShader.");
             return _shaders.GetValueOrDefault("Error")
-                   ?? throw new Exception("[Error] ErrorShader is missing.");
+                   ?? throw new Exception("[Fatal] ErrorShader is missing.");
         }
 
         /// <summary>
         /// Uses Shader.FromFolder
         /// </summary>
         /// <param name="path">Path in Assets/Shaders/</param>
-        /// <param name="name">Internal shader name</param>
+        /// <param name="name">Internal shader name to set</param>
         /// <returns></returns>
         public Shader LoadShader(string path, string name)
         {

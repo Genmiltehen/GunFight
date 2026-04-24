@@ -12,7 +12,7 @@ namespace XEngine.Core.Graphics
         public void AddRenderModule(RenderModule renderModule)
         {
             _renderModules.Add(renderModule);
-            _renderModules.Sort((a, b) => b.Priority.CompareTo(a.Priority)); // inverted: 0 - top, 500 - bottom
+            _renderModules.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
         public void SetViewport(int width, int height)

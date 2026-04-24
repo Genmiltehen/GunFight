@@ -4,7 +4,7 @@ using OtkKeys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 namespace WinFormsUI.Game.Input
 {
     /// <summary>
-    /// Only supports A-Z and Arrow Keys
+    /// Only supports A-Z, Arrow Keys, Shift, Insert, Ctrl
     /// </summary>
     public static class KeyConverter
     {

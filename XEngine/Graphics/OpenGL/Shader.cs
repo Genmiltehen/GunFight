@@ -13,7 +13,8 @@ namespace XEngine.Core.Graphics.OpenGL
         private static int _currentBoundHandle = -1;    // видно всем чтобы не менять handle когда не надо
 
         /// <summary>
-        /// Initializes Shader from folder, which must contain shader_vert.glsl and shader_frag.glsl
+        /// Initializes Shader from folder.
+        /// Folder must contain shader_vert.glsl and shader_frag.glsl
         /// </summary>
         /// <param name="folderPath">folder to shader sources</param>
         /// <returns></returns>

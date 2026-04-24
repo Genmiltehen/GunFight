@@ -82,6 +82,7 @@ namespace XEngine.Core.DebugUtils.Render
             using (lb.TraceLine(closed: true))
             {
                 for (int i = 0; i <= CircRes; i++)
+
                 {
                     float ang = MathF.Tau / CircRes * i;
                     B2Vec2 point = b2RotateVector(b2MakeRot(ang), new B2Vec2(circle.radius, 0));

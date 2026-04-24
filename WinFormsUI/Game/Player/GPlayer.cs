@@ -1,10 +1,4 @@
 ﻿using Box2D.NET;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WinFormsUI.Game.Box2D;
 using WinFormsUI.Game.Player.PlayerStates;
 using XEngine.Core.Base;

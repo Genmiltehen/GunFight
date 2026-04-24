@@ -9,8 +9,8 @@ namespace XEngine.Core.Input
     public interface IInputService
     {
         public bool IsActionActive(string actionName);
-        public bool IsActionJustActivated(string actionName);
-        // IsActionJustDeactivated
+        public bool IsActionJustPressed(string actionName);
+        public bool IsActionJustReleased(string actionName);
         public float GetAxis(string axisName);
     }
 }

@@ -5,7 +5,7 @@ using XEngine.Core.Box2DCompat.Components;
 
 namespace XEngine.Core.Common
 {
-    public sealed class GTransform : GameComponent, IDirty
+    public sealed class GTransform : GameComponent, IDirtiable
     {
         private Vector3 _position = Vector3.Zero;
         private float _rotation = 0;

@@ -24,7 +24,7 @@ namespace WinFormsUI
         {
             InitializeComponent();
 
-            string assetsPath = Path.Combine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight", "Assets");
+            string assetsPath = Path.Combine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight", "Assets"); // change to Application Directory
             _engine = new GameEngine(assetsPath);
 
             this.KeyPreview = true;

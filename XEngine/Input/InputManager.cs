@@ -28,10 +28,17 @@ namespace XEngine.Core.Input
             return false;
         }
 
-        public bool IsActionJustActivated(string actionName)
+        public bool IsActionJustPressed(string actionName)
         {
             if (!_actionBindings.TryGetValue(actionName, out var keys)) return false;
             foreach (var key in keys) if (_downKeys.Contains(key) && !_previousDownKeys.Contains(key)) return true;
+            return false;
+        }
+
+        public bool IsActionJustReleased(string actionName)
+        {
+            if (!_actionBindings.TryGetValue(actionName, out var keys)) return false;
+            foreach (var key in keys) if (!_downKeys.Contains(key) && _previousDownKeys.Contains(key)) return true;
             return false;
         }
 

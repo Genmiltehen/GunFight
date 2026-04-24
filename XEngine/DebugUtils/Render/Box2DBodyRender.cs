@@ -39,7 +39,5 @@ namespace XEngine.Core.DebugUtils.Render
             _glProvider.LineBatcher.Draw();
             _glProvider.LineBatcher.Clear();
         }
-
-
     }
 }

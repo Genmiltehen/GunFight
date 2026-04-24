@@ -21,7 +21,6 @@ namespace XEngine.Core.Box2DCompat.Systems
             _subSteps = SubSteps;
         }
 
-
         public void Update(GScene _scene, float _dt)
         {
             var pairs = _scene.Query<GTransform, GBox2DBody>();

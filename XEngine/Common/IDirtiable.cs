@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XEngine.Core.Common
 {
-    public interface IDirty
+    public interface IDirtiable
     {
         void SetDirty();
     }

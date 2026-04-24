@@ -1,6 +1,6 @@
 ﻿namespace XEngine.Core.Base
 {
-    public class Entity
+    public sealed class Entity : IDisposable
     {
         public bool IsDeleted { get; set; } = false;
         private readonly Dictionary<Type, GameComponent> _components = [];
@@ -31,6 +31,11 @@
             }
             comp = (T)_components[typeof(T)];
             return true;
+        }
+
+        public void Dispose()
+        {
+            foreach (var pair in _components) (pair.Value as IDisposable)?.Dispose();
         }
     }
 }

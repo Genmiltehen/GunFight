@@ -44,7 +44,7 @@ namespace WinFormsUI.Game.Player
                     capsuleDef.density = 1f;
                     capsuleDef.material.friction = 0.1f;
                     capsuleDef.filter.categoryBits = (ulong)CollisionFlags.PLAYER;
-                    capsuleDef.filter.maskBits = (ulong)(CollisionFlags.PLAYER | CollisionFlags.GROUND);
+                    capsuleDef.filter.maskBits = (ulong)CollisionFlags.GROUND;
                     B2Shapes.b2CreateCapsuleShape(bid, capsuleDef, capsule);
                 }).AttacShapes(bid => // -- circle sensor for ground collision --
                 {

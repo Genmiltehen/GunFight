@@ -21,7 +21,7 @@ namespace WinFormsUI.Game.Player.PlayerStates
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            var jumped = scene.Input.IsActionJustActivated($"jump{player.Name}");
+            var jumped = scene.Input.IsActionJustPressed($"jump{player.Name}");
             var b2body = player.Owner.Get<GBox2DBody>()!;
             if (jumped) B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(0, player.JumpPower), true);
 

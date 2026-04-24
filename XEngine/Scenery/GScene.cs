@@ -30,7 +30,7 @@ namespace XEngine.Core.Scenery
             _cam.AddComponent<GTransform>();
 
             var _wld = CreateEntity();
-            World = _wld.AddComponent<GBox2DWorld>().Init(pixelPerMetre: 16);
+            World = _wld.AddComponent<GBox2DWorld>().Init(pixelPerMetre: 16, gravity: new B2Vec2(0, -18));
         }
 
         public Entity CreateEntity()
@@ -47,12 +47,17 @@ namespace XEngine.Core.Scenery
             _systems.Sort((a, b) => a.Priority.CompareTo(b.Priority));
         }
 
+        public void RemoveSystem(IGameSystem system)
+        {
+            _systems.Remove(system);
+        }
+
         public void Schedule(Action action)
         {
             actions.Add(action);
         }
 
-        // TODO: add removers
+
 
         public virtual void Load() { }
         public void Unload()
@@ -88,7 +93,7 @@ namespace XEngine.Core.Scenery
             {
                 if (_entities.TryGetValue(key, out var value))
                 {
-                    (value as IDisposable)?.Dispose();
+                    value.Dispose();
                     _entities.Remove(key);
                 }
             }

@@ -15,11 +15,11 @@ namespace XEngine.Core.Box2DCompat.Components
         public int PixelPerMetre = 1;
         private bool _disposed = false;
 
-        public GBox2DWorld Init(int pixelPerMetre)
+        public GBox2DWorld Init(int pixelPerMetre, B2Vec2 gravity)
         {
             PixelPerMetre = pixelPerMetre;
             B2WorldDef worldDef = B2Types.b2DefaultWorldDef();
-            worldDef.gravity = new B2Vec2(0, -18);
+            worldDef.gravity = gravity;
 
             Id = B2Worlds.b2CreateWorld(worldDef);
             return this;
