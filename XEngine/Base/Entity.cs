@@ -1,14 +1,18 @@
-﻿namespace XEngine.Core.Base
+﻿using XEngine.Core.Common;
+
+namespace XEngine.Core.Base
 {
     public sealed class Entity : IDisposable
     {
-        public bool IsDeleted { get; set; } = false;
-        private readonly Dictionary<Type, GameComponent> _components = [];
         public int Id { get; private set; }
+        public GTransform Transform { get; private set; }
+        private readonly Dictionary<Type, GameComponent> _components = [];
+        internal bool _isDeleted = false;
 
         internal Entity(int id)
         {
             Id = id;
+            Transform = AddComponent<GTransform>();
         }
 
         public T AddComponent<T>() where T : GameComponent, new()
@@ -31,6 +35,23 @@
             }
             comp = (T)_components[typeof(T)];
             return true;
+        }
+
+        public void Remove()
+        {
+            _isDeleted = true;
+
+            Entity? current = Transform.FirstChild?.Owner;
+            while (current != null)
+            {
+                current.Remove();
+                current = current.Transform.NextSibling?.Owner;
+            }
+        }
+
+        public Entity? GetChild(int index)
+        {
+            return Transform.GetChild(index)?.Owner;
         }
 
         public void Dispose()

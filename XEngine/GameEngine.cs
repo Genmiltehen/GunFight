@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using XEngine.Core.Common.Sprite;
+using XEngine.Core.Common.Sprite.NineSlice;
 using XEngine.Core.Config;
 using XEngine.Core.DebugUtils.Render;
 using XEngine.Core.Graphics;
@@ -44,11 +45,14 @@ namespace XEngine.Core
 
             _glProvider.Init();
             _glProvider.LoadShader("Line", "Line");
+            _glProvider.LoadShader("NineSlice", "NineSlice");
 
             var spriteRenderer = new SpriteRendererModule(_glProvider);
             var debugRenderer = new Box2DBodyRender(_glProvider);
+            var nineslicerenderer = new NineSliceRendererModule(_glProvider);
             _renderPipeline.AddRenderModule(spriteRenderer);
             _renderPipeline.AddRenderModule(debugRenderer);
+            _renderPipeline.AddRenderModule(nineslicerenderer);
 
             _input.LoadBindingsFromConfig(_config);
         }

@@ -14,14 +14,14 @@ namespace XEngine.Core.Graphics.OpenGL
 
         /// <summary>
         /// Initializes Shader from folder.
-        /// Folder must contain shader_vert.glsl and shader_frag.glsl
+        /// Folder must contain shader.vert and shader.frag
         /// </summary>
         /// <param name="folderPath">folder to shader sources</param>
         /// <returns></returns>
         public static Shader FromFolder(string folderPath)
         {
-            var _vertexPath = Path.Combine(folderPath, "shader_vert.glsl");
-            var _fragentPath = Path.Combine(folderPath, "shader_frag.glsl");
+            var _vertexPath = Path.Combine(folderPath, "shader.vert");
+            var _fragentPath = Path.Combine(folderPath, "shader.frag");
             return new Shader(File.ReadAllText(_vertexPath), File.ReadAllText(_fragentPath));
         }
 
@@ -141,6 +141,12 @@ namespace XEngine.Core.Graphics.OpenGL
             if (loc != -1) GL.Uniform3(loc, value);
         }
 
+        public void SetVector4(string name, Vector4 value)
+        {
+            int loc = GetUniformLocation(name);
+            if (loc != -1) GL.Uniform4(loc, value);
+        }
+
         public void SetMatrix4(string name, Matrix4 value)
         {
             int loc = GetUniformLocation(name);
@@ -150,11 +156,11 @@ namespace XEngine.Core.Graphics.OpenGL
         // --- Cleanup --
         public void Dispose()
         {
-            Dispose(true);
+            Dispose_();
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool _disposing)
+        private void Dispose_()
         {
             if (_disposed) return;
             _disposed = true;
@@ -164,6 +170,6 @@ namespace XEngine.Core.Graphics.OpenGL
             GL.DeleteProgram(Handle);
         }
 
-        ~Shader() => Dispose(false);
+        ~Shader() => Dispose_();
     }
 }

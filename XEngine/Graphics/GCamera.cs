@@ -2,40 +2,43 @@
 using System.Diagnostics;
 using XEngine.Core.Base;
 using XEngine.Core.Common;
+using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Graphics
 {
     public sealed class GCamera : GameComponent
     {
         public int Priority { get; private set; }
-        public GTransform Transform => Owner.Get<GTransform>()!;
 
-        private float _zoom = 0;
-        private float _ezoom = 1;
-        private bool _isDirty = true;
+        private float _zoom = 1;
         private Matrix4 _savedScale = Matrix4.CreateScale(1, 1, 1);
 
-        public float EZoom => _ezoom;
         public float Zoom
         {
             get => _zoom;
             set
             {
-                _zoom = value;
-                _ezoom = MathF.Exp(_zoom);
-                _isDirty = true;
+                if (value != _zoom)
+                {
+                    _zoom = value;
+                    _savedScale = Matrix4.CreateScale(_zoom, _zoom, 1);
+                }
             }
+        }
+
+        public void Approach(Vector3 newPos, float strength)
+        {
+            Owner.Transform.Position = Vector3.Lerp(Owner.Transform.Position, newPos, strength);
+        }
+
+        public Matrix4 GetProjectionMatrix(Vector2 size)
+        {
+            return Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4, size.X / size.Y, 1, 200);
         }
 
         public Matrix4 GetViewMatrix()
         {
-            if (_isDirty)
-            {
-                _savedScale = Matrix4.CreateScale(_ezoom, _ezoom, 1);
-                _isDirty = false;
-            }
-            var worldMatrix = _savedScale * Transform.GetWorldMatrix();
-            return Matrix4.Invert(worldMatrix);
+            return _savedScale * Matrix4.Invert(Owner.Transform.GetWorldMatrix());
         }
     }
 }

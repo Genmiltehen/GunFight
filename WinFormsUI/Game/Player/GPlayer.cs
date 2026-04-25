@@ -1,38 +1,44 @@
 ﻿using Box2D.NET;
+using System.Diagnostics.CodeAnalysis;
 using WinFormsUI.Game.Box2D;
 using WinFormsUI.Game.Player.PlayerStates;
+using WinFormsUI.Game.Player.Stats;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Input;
 using XEngine.Core.Scenery;
+using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Player
 {
     public class GPlayer : GameComponent
     {
-        // TODO: Вынос в компонент PlayerStats
-        public float TopSpeed = 5;
-        public float Acceleration = 30;
-        public float JumpPower = 30;
-
         public string Name = "";
+        public bool IsRightFacing = true;
 
-        public Entity BodyEntity;
-        public Entity HeadEntity;
-        public Entity WeaponEntity;
+        public Entity BodyEntity { get; private set; } = null!;
+        public Entity HeadEntity { get; private set; } = null!;
+        public Entity WeaponEntity { get; private set; } = null!;
+
+        public readonly GameTimer JumpTimer = new(0.3f);
+        public readonly GameTimer ShootTimer = new(0.5f);
+        public PlayerEffectList Effects = null!;
 
         private IPlayerState? _state;
-        private bool _isRight = true;
 
-        public GPlayer Init(Entity body, Entity head, Entity weapon)
+        public GPlayer Init(GScene scene, IPlayerStats stats)
         {
-            BodyEntity = body;
-            HeadEntity = head;
-            WeaponEntity = weapon;
+            BodyEntity = Owner;
+            HeadEntity = Owner.GetChild(1)!;
+            WeaponEntity = Owner.GetChild(0)!;
 
+            Effects = new(stats);
             _state = new IdleState();
+
+            scene.RegisterTimer(JumpTimer);
+            scene.RegisterTimer(ShootTimer);
             return this;
         }
 
@@ -46,21 +52,30 @@ namespace WinFormsUI.Game.Player
             return input.GetAxis($"Horizontal{Name}");
         }
 
-        public void SetFacing(B2Vec2 dir)
+        public GPlayer SetFacing(B2Vec2 dir)
         {
             float angle = B2MathFunction.b2Atan2(dir.Y, dir.X);
-            HeadEntity.Get<GTransform>()!.Rotation = angle;
-            WeaponEntity.Get<GTransform>()!.Rotation = angle;
+            HeadEntity.Transform.Rotation = angle;
+            WeaponEntity.Transform.Rotation = angle;
 
-            if (_isRight != dir.X > 0)
+            if (IsRightFacing != dir.X > 0)
             {
-                _isRight = dir.X > 0;
-                float flip = _isRight ? 1 : -1;
-                BodyEntity.Get<GSprite>()!.SetScale(new(flip, 1));
-                HeadEntity.Get<GSprite>()!.SetScale(new(1, flip));
-                WeaponEntity.Get<GSprite>()!.SetScale(new(1, flip));
+                IsRightFacing = dir.X > 0;
+                float flip = IsRightFacing ? 1 : -1;
+                BodyEntity.Get<GSprite>()!.SetSize(new(flip, 1));
+                HeadEntity.Get<GSprite>()!.SetSize(new(1, flip));
+                WeaponEntity.Get<GSprite>()!.SetSize(new(1, flip));
             }
+            return this;
         }
+
+        public GPlayer SetName(string name)
+        {
+            Name = name;
+            return this;
+        }
+
+        public IPlayerStats Stats => Effects.GetStats();
 
         public void SwitchTo<T>() where T : IPlayerState, new()
         {

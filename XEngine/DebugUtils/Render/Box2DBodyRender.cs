@@ -26,8 +26,8 @@ namespace XEngine.Core.DebugUtils.Render
         public override void Render(GScene scene)
         {
             _line_shader.Use();
-            _line_shader.SetMatrix4("uProjection", _projection);
 
+            _line_shader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
             _line_shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
             _line_shader.SetVector3("uColor", new(1, 0, 0));
 

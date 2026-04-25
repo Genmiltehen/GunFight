@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace XEngine.Core.Utils
+namespace XEngine.Core.Utils.Maths
 {
     public readonly struct Segment
     {

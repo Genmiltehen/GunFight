@@ -20,11 +20,11 @@ namespace XEngine.Core.Common.Sprite
 
         public override void Render(GScene scene)
         {
-            if (!ValidateDraw(scene)) return;
+            if (_screenSize.X <= 0 || _screenSize.Y <= 0) return;
 
             _spriteShader.Use();
-            _spriteShader.SetMatrix4("uProjection", _projection);
 
+            _spriteShader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
             _spriteShader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
             _spriteShader.SetInt("uTexture", 0);
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -32,20 +32,17 @@ namespace XEngine.Core.Common.Sprite
             _provider.UnitQuad.Bind();
             foreach (var (_, tr, sprite) in scene.Query<GTransform, GSprite>())
             {
-                sprite.Texture.Use();
+                sprite.UseTexture();
 
-                var modelMatrix = sprite.GetAssetScale() * tr.GetWorldMatrix();
+                var ts = sprite.TextureSize;
+                var texSize = sprite.IsUseTextureSize ? Matrix4.CreateScale(ts.X, ts.Y, 1) : Matrix4.Identity;
+                var modelMatrix = scene.World.PPMScale * texSize * sprite.GetModelMatrix() * tr.GetWorldMatrix();
                 _spriteShader.SetMatrix4("uModel", modelMatrix);
 
                 _provider.UnitQuad.Draw();
             }
 
             GL.BindVertexArray(0);
-        }
-
-        private bool ValidateDraw(GScene _scene)
-        {
-            return !(_screenWidth <= 0 || _screenHeight <= 0);
         }
     }
 }

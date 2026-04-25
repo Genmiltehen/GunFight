@@ -7,11 +7,14 @@ using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Player
 {
-    internal class PlayersControl(IInputService input) : InputSystem(input)
+    internal class PlayersSystem(IInputService input) : InputSystem(input)
     {
         public override void Update(GScene _scene, float _dt)
         {
-            foreach (var (_, player) in _scene.Query<GPlayer>()) player.ProcessInput(_scene, _dt);
+            foreach (var (_, player) in _scene.Query<GPlayer>())
+            {
+                player.ProcessInput(_scene, _dt);
+            }
         }
     }
 }

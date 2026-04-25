@@ -4,20 +4,14 @@ using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Graphics
 {
-    public sealed class AssetManager : IAssetLoader, IDisposable
+    public sealed class AssetManager(string AssetPath) : IAssetLoader, IDisposable
     {
         private readonly Dictionary<string, Texture2D> _persistentTextures = [];
         private readonly Dictionary<string, Texture2D> _sceneTextures = [];
         private bool _disposed = false;
 
-        public readonly string RootPath;
+        public readonly string RootPath = Path.GetFullPath(AssetPath);
         public string ShaderPath => Path.Combine(RootPath, "Shaders");
-
-
-        public AssetManager(string AssetPath)
-        {
-            RootPath = Path.GetFullPath(AssetPath);
-        }
 
         public void Init()
         {

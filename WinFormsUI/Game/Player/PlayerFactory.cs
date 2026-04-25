@@ -1,45 +1,50 @@
 ﻿using Box2D.NET;
 using WinFormsUI.Game.Box2D;
+using WinFormsUI.Game.Player.Stats;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Scenery;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace WinFormsUI.Game.Player
 {
     public static class PlayerFactory
     {
-        public static GPlayer CreatePlayer(GScene scene, B2Vec2 size)
-        {
-            var body = CreateBody(scene, size);
-            var head = CreateHead(scene, size);
-            var weapon = CreateWeapon(scene, size);
-            head.Get<GTransform>()!.SetParent(body.Get<GTransform>()!);
-            weapon.Get<GTransform>()!.SetParent(body.Get<GTransform>()!);
+        private static readonly B2Vec2 PLAYER_SIZE = new(1f, 2f);
 
-            return body.AddComponent<GPlayer>().Init(body, head, weapon);
+        public static GPlayer CreatePlayer(GScene scene, B2Vec2 pos, string name, IPlayerStats stats)
+        {
+            var body = CreateBody(scene, pos);
+            var head = CreateHead(scene);
+            var weapon = CreateWeapon(scene);
+            head.Get<GTransform>()!.SetParent(body.Transform);
+            weapon.Get<GTransform>()!.SetParent(body.Transform);
+
+            return body.AddComponent<GPlayer>()
+                .Init(scene, stats)
+                .SetName(name)
+                .SetFacing(new(1, 0));
         }
 
-        private static Entity CreateBody(GScene scene, B2Vec2 size)
+        private static Entity CreateBody(GScene scene, B2Vec2 pos)
         {
             var e = scene.CreateEntity();
-            var tr = e.AddComponent<GTransform>().Init(new(0, 10, 0), 0f);
-            e.AddComponent<GSprite>()
-                .SetSourceTextureScale(1.0f / scene.World.PixelPerMetre)
-                .SetTranslation(new(0, size.Y * 0.5f));
+            e.Transform.Init(new(pos.X, pos.Y, 0), 0f);
+            e.AddComponent<GSprite>().SetTranslation(new(0, 0.75f));
 
-            float r = 0.5f * size.X;
+            float r = 0.5f * PLAYER_SIZE.X;
             var bodyComp = e.AddComponent<GBox2DBody>()
                 .Init()
                 .SetType(B2BodyType.b2_dynamicBody)
                 .SetMotinLocks(new B2MotionLocks { angularZ = true })
-                .SyncToTransform(tr)
+                .SyncToTransform(e.Transform)
                 .Build(scene.World.Id)
                 .AttacShapes(bid => // -- main body --
                 {
-                    B2Capsule capsule = B2HelperMethods.MakeCapsule(new(new(-r, 0), new(r, size.Y)));
+                    B2Capsule capsule = B2HelperMethods.MakeCapsule(new(new(-r, 0), new(r, PLAYER_SIZE.Y)));
                     B2ShapeDef capsuleDef = B2Types.b2DefaultShapeDef();
                     capsuleDef.density = 1f;
                     capsuleDef.material.friction = 0.1f;
@@ -53,28 +58,25 @@ namespace WinFormsUI.Game.Player
                     circleSensorDef.enableSensorEvents = true;
                     circleSensorDef.filter.categoryBits = (ulong)CollisionFlags.FOOT;
                     circleSensorDef.filter.maskBits = (ulong)CollisionFlags.GROUND;
-                    B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, r * 0.8f), r));
+                    B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, r * 0.9f), r));
                 });
             B2Bodies.b2Body_SetUserData(bodyComp.Id, B2UserData.Ref(new PlayerUserData()));
             return e;
         }
 
-        private static Entity CreateHead(GScene scene, B2Vec2 size)
+        private static Entity CreateHead(GScene scene)
         {
             var e = scene.CreateEntity();
-            e.AddComponent<GTransform>().Init(new(0, size.Y, 0), 0f);
-            e.AddComponent<GSprite>()
-                .SetSourceTextureScale(1.0f / scene.World.PixelPerMetre);
+            e.Transform.Init(new(0, PLAYER_SIZE.Y * 0.75f, 0), 0f);
+            e.AddComponent<GSprite>();
             return e;
         }
 
-        private static Entity CreateWeapon(GScene scene, B2Vec2 size)
+        private static Entity CreateWeapon(GScene scene)
         {
             var e = scene.CreateEntity();
-            e.AddComponent<GTransform>().Init(new(0, size.Y * 0.6f, 0), 0f);
-            e.AddComponent<GSprite>()
-                .SetSourceTextureScale(1.0f / scene.World.PixelPerMetre)
-                .SetTranslation(new(size.X * 0.25f, 0));
+            e.Transform.Init(new(0, PLAYER_SIZE.Y * 0.5f, 0), 0f);
+            e.AddComponent<GSprite>().SetTranslation(new(PLAYER_SIZE.X * 0.25f, 0));
             return e;
         }
     }

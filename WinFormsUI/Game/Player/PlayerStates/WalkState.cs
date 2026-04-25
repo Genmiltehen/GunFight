@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils;
+using XEngine.Core.Utils.Maths;
 
 namespace WinFormsUI.Game.Player.PlayerStates
 {
@@ -22,12 +22,15 @@ namespace WinFormsUI.Game.Player.PlayerStates
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
             var b2body = player.Owner.Get<GBox2DBody>()!;
-            var jumped = scene.Input.IsActionJustPressed($"jump{player.Name}");
-            if (jumped) B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(0, player.JumpPower), true);
+            if (scene.Input.IsActionJustPressed($"jump{player.Name}"))
+            {
+                player.JumpTimer.Start();
+                B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(0, player.Stats.JumpPower), true);
+            }
 
             if (!player.IsOnGround())
             {
-                player.SwitchTo<AirborneState>();
+                player.SwitchTo<FallState>();
                 return;
             }
 
@@ -39,7 +42,7 @@ namespace WinFormsUI.Game.Player.PlayerStates
             }
 
             var vel = B2Bodies.b2Body_GetLinearVelocity(b2body.Id);
-            var delta = Box2DMathUtils.MoveToward(vel.X, player.TopSpeed * hor, player.Acceleration * dt) - vel.X;
+            var delta = MathUtils.MoveToward(vel.X, player.Stats.TopSpeed * hor, player.Stats.Acceleration * dt) - vel.X;
             B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(delta, 0), true);
             player.SetFacing(new(hor, 0));
         }

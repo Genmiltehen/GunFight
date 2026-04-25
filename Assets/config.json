@@ -10,7 +10,7 @@
 		"sitB": "K",
 		"leftB": "J",
 		"rightB": "L",
-		"shootB": "Insert"
+		"shootB": "Space"
 	},
 	"axes": {
 		"HorizontalA": {

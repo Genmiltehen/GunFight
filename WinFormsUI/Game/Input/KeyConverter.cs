@@ -42,6 +42,7 @@ namespace WinFormsUI.Game.Input
             { WinKeys.Right, OtkKeys.Right },
 
             { WinKeys.ShiftKey, OtkKeys.LeftShift },
+            { WinKeys.Space, OtkKeys.Space },
             { WinKeys.Insert, OtkKeys.Insert },
             { WinKeys.Control, OtkKeys.LeftControl },
         };

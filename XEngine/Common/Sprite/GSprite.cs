@@ -4,59 +4,72 @@ using XEngine.Core.Graphics.OpenGL;
 
 namespace XEngine.Core.Common.Sprite
 {
-    public sealed class GSprite : GameComponent
+    public class GSprite : GameComponent
     {
-        public Texture2D Texture { get; private set; }
-        private Matrix4 _translation = Matrix4.Identity;
-        private Matrix4 _rotation = Matrix4.Identity;
-        private Matrix4 _scale = Matrix4.Identity;
-        private Matrix4 _tr = Matrix4.Identity;
-        private bool _useTextureScale = false;
-        private float _textureScale = 1;
+        public Texture2D Texture { get; set; } = null!;
 
-        public GSprite SetTexture(Texture2D texture, bool _useTextureScale)
+        protected Vector2 _position = Vector2.Zero;
+        protected float _rotation = 0f;
+        protected Vector2 _size = Vector2.One;
+
+        protected Matrix4 _modelMatrix = Matrix4.Identity;
+        protected bool _isDirty = true;
+        public bool IsUseTextureSize { get; protected set; } = false;
+
+        public GSprite SetTexture(Texture2D texture, bool useTextureSize)
         {
             Texture = texture;
-            this._useTextureScale = _useTextureScale;
-            Recalculate();
+            IsUseTextureSize = useTextureSize;
+            _isDirty = true;
             return this;
         }
 
         public GSprite SetTranslation(Vector2 vec)
         {
-            _translation = Matrix4.CreateTranslation(vec.X, vec.Y, 0);
-            Recalculate();
+            _position = vec;
+            _isDirty = true;
             return this;
         }
 
         public GSprite SetRotation(float rotation)
         {
-            _rotation = Matrix4.CreateRotationZ(rotation);
-            Recalculate();
+            _rotation = rotation;
+            _isDirty = true;
             return this;
         }
 
-        public GSprite SetScale(Vector2 scale)
+        public GSprite SetSize(Vector2 size)
         {
-            _scale = Matrix4.CreateScale(scale.X, scale.Y, 1);
-            Recalculate();
+            _size = size;
+            _isDirty = true;
             return this;
         }
 
-        public GSprite SetSourceTextureScale(float scale)
+        public Matrix4 GetModelMatrix()
         {
-            _textureScale = scale;
-            return this;
+            if (_isDirty) Recalculate();
+            return _modelMatrix;
         }
 
-        private void Recalculate()
+        protected void Recalculate()
         {
-            var _texScale = _useTextureScale && Texture != null
-                ? Matrix4.CreateScale(Texture.Width * _textureScale, Texture.Height * _textureScale, 1)
-                : Matrix4.Identity;
-            _tr = _texScale * _scale * _rotation * _translation;
+            if (Texture == null)
+            {
+                _modelMatrix = Matrix4.Identity;
+                _isDirty = false;
+                return;
+            }
+
+            var scaleMat = Matrix4.CreateScale(_size.X, _size.Y, 1f);
+            var rotMat = Matrix4.CreateRotationZ(_rotation);
+            var transMat = Matrix4.CreateTranslation(_position.X, _position.Y, 0f);
+
+            _modelMatrix = scaleMat * rotMat * transMat;
+            _isDirty = false;
         }
 
-        public Matrix4 GetAssetScale() => _tr;
+        public void UseTexture() => Texture.Use();
+
+        public Vector2 TextureSize => new(Texture.Width, Texture.Height);
     }
 }
