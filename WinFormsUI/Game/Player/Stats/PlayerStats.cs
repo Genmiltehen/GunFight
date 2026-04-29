@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace WinFormsUI.Game.Player.Stats
 {
-    public class PlayerStats(float topSpeed, float acceleration, float jumpPower) : IPlayerStats
+    public class PlayerStats(PlayerConfig config) : IPlayerStats
     {
-        public float TopSpeed { get; private set; } = topSpeed;
+        public float TopSpeed { get; private set; } = config.Speed;
 
-        public float Acceleration { get; private set; } = acceleration;
+        public float Acceleration { get; private set; } = config.Acceleration;
 
-        public float JumpPower { get; private set; } = jumpPower;
+        public float JumpPower { get; private set; } = config.JumpPower;
     }
 }

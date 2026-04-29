@@ -14,6 +14,9 @@ namespace XEngine.Core.Utils.Maths
     {
         public const float Epsilon = 1e-6f;
 
+        public static Vector4 Homogenize(Vector3 v) => new(v.X, v.Y, v.X, 1);
+        public static Vector3 Dehomogenize(Vector4 v) => v.Xyz / v.W;
+
         public static float Cross2D(Vector2 a, Vector2 b)
         {
             return a.X * b.Y - a.Y * b.X;

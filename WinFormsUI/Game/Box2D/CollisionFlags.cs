@@ -13,5 +13,7 @@ namespace WinFormsUI.Game.Box2D
         GROUND = 1 << 0,
         PLAYER = 1 << 1,
         FOOT = 1 << 2,
+        PROJECTILE = 1 << 3,
+        ITEM = 1 << 4,
     }
 }

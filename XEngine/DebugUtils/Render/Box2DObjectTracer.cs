@@ -1,9 +1,11 @@
 ﻿using Box2D.NET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using XEngine.Core.Graphics.OpenGL;
 
@@ -26,69 +28,94 @@ namespace XEngine.Core.DebugUtils.Render
 
         private static void TraceShape(B2ShapeId shapeId, B2Transform transform, LineBatcher lb)
         {
-            switch (B2Shapes.b2Shape_GetType(shapeId))
+            using (lb.TraceLine(closed: true))
             {
-                case B2ShapeType.b2_polygonShape:
-                    TracePolygon(lb, B2Shapes.b2Shape_GetPolygon(shapeId), transform);
-                    break;
-                case B2ShapeType.b2_capsuleShape:
-                    TraceCapsule(lb, B2Shapes.b2Shape_GetCapsule(shapeId), transform);
-                    break;
-                case B2ShapeType.b2_circleShape:
-                    TraceCircle(lb, B2Shapes.b2Shape_GetCircle(shapeId), transform);
-                    break;
+                switch (B2Shapes.b2Shape_GetType(shapeId))
+                {
+                    case B2ShapeType.b2_circleShape:
+                        TraceSegment(lb, B2Shapes.b2Shape_GetSegment(shapeId), transform);
+                        break;
+                    case B2ShapeType.b2_capsuleShape:
+                        TraceCapsule(lb, B2Shapes.b2Shape_GetCapsule(shapeId), transform);
+                        break;
+                    case B2ShapeType.b2_segmentShape:
+                        TraceCircle(lb, B2Shapes.b2Shape_GetCircle(shapeId), transform);
+                        break;
+                    case B2ShapeType.b2_polygonShape:
+                        TracePolygon(lb, B2Shapes.b2Shape_GetPolygon(shapeId), transform);
+                        break;
+                }
             }
         }
 
+        private static void CalcArc(ref B2Vec2[] points, float radius, float startAngle, float endAngle)
+        {
+            float t, ang;
+            for (int i = 0; i < points.Length; i++)
+            {
+                t = (float)i / (points.Length - 1);
+                ang = float.Lerp(startAngle, endAngle, t);
+                points[i] = b2RotateVector(b2MakeRot(ang), new B2Vec2(radius, 0));
+            }
+        }
+
+        private static void TraceSegment(LineBatcher lb, B2Segment seg, B2Transform tr)
+        {
+            lb.AddPoint(b2TransformPoint(tr, seg.point1));
+            lb.AddPoint(b2TransformPoint(tr, seg.point2));
+        }
+
+        private readonly static int PolyRes = 8;
         private static void TracePolygon(LineBatcher lb, B2Polygon poly, B2Transform tr)
         {
-            using (lb.TraceLine(closed: true))
+            B2Vec2[] points = new B2Vec2[PolyRes + 1];
+            B2Vec2 prev = b2TransformPoint(tr, poly.vertices[poly.count - 1]);
+            B2Vec2 curr = b2TransformPoint(tr, poly.vertices[0]);
+            B2Vec2 next = b2TransformPoint(tr, poly.vertices[1]);
+            GetAngles(prev, curr, next, out float start, out float end);
+            CalcArc(ref points, poly.radius, start, end);
+            for (int i = 0; i <= PolyRes; i++) lb.AddPoint(b2Add(points[i], curr));
+
+            for (int i = 1; i < poly.count; i++)
             {
-                for (int i = 0; i < poly.count; i++)
-                {
-                    lb.AddPoint(b2TransformPoint(tr, poly.vertices[i]));
-                }
+                prev = curr;
+                curr = next;
+                next = b2TransformPoint(tr, poly.vertices[(i + 1) % poly.count]);
+                GetAngles(prev, curr, next, out start, out end);
+                CalcArc(ref points, poly.radius, start, end);
+                for (int j = 0; j <= PolyRes; j++) lb.AddPoint(b2Add(points[j], curr));
             }
+        }
+
+        private static void GetAngles(B2Vec2 a, B2Vec2 b, B2Vec2 c, out float start, out float end)
+        {
+            start = B2MathFunction.b2Atan2(b.Y - c.Y, b.X - c.X);
+            end = B2MathFunction.b2Atan2(b.Y - a.Y, b.X - a.X);
+            if (end < start) end += MathF.Tau;
         }
 
         private readonly static int CapRes = 8;
         private static void TraceCapsule(LineBatcher lb, B2Capsule capsule, B2Transform tr)
         {
-            using (lb.TraceLine(closed: true))
-            {
-                float capAng = b2Atan2(
-                    capsule.center2.Y - capsule.center1.Y,
-                    capsule.center2.X - capsule.center1.X
-                ) + MathF.PI / 2;
-                for (int i = 0; i <= CapRes; i++)
-                {
-                    float ang = MathF.PI / CapRes * i + capAng;
-                    B2Vec2 point = b2RotateVector(b2MakeRot(ang), new B2Vec2(capsule.radius, 0));
-                    lb.AddPoint(b2TransformPoint(tr, b2Add(point, capsule.center1)));
-                }
-                capAng += MathF.PI;
-                for (int i = 0; i <= CapRes; i++)
-                {
-                    float ang = MathF.PI / CapRes * i + capAng;
-                    B2Vec2 point = b2RotateVector(b2MakeRot(ang), new B2Vec2(capsule.radius, 0));
-                    lb.AddPoint(b2TransformPoint(tr, b2Add(point, capsule.center2)));
-                }
-            }
+            float capAng = b2Atan2(
+                capsule.center1.Y - capsule.center2.Y,
+                capsule.center1.X - capsule.center2.X
+            ) - MathF.PI / 2;
+
+            B2Vec2[] points = new B2Vec2[CapRes + 1];
+            CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
+            for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], b2TransformPoint(tr, capsule.center1)));
+            capAng += MathF.PI;
+            CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
+            for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], b2TransformPoint(tr, capsule.center2)));
         }
 
         private readonly static int CircRes = 16;
         private static void TraceCircle(LineBatcher lb, B2Circle circle, B2Transform tr)
         {
-            using (lb.TraceLine(closed: true))
-            {
-                for (int i = 0; i <= CircRes; i++)
-
-                {
-                    float ang = MathF.Tau / CircRes * i;
-                    B2Vec2 point = b2RotateVector(b2MakeRot(ang), new B2Vec2(circle.radius, 0));
-                    lb.AddPoint(b2TransformPoint(tr, b2Add(point, circle.center)));
-                }
-            }
+            B2Vec2[] points = new B2Vec2[CircRes + 1];
+            CalcArc(ref points, circle.radius, 0, MathF.Tau);
+            for (int i = 0; i <= CircRes; i++) lb.AddPoint(b2Add(points[i], b2TransformPoint(tr, circle.center)));
         }
     }
 }

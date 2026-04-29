@@ -1,0 +1,12 @@
+[
+	{
+		"Id": "baldy",
+		"Armor": 0,
+		"MaxHealth": 10,
+		"HealthRegenRate": 1,
+		"Speed": 3,
+		"Acceleration": 35,
+		"JumpPower": 15,
+		"TextureName": "Baldy"
+	}
+]

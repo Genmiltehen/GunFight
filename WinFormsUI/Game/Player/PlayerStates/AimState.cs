@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using WinFormsUI.Game.Scenes;
+using XEngine.Core.Common.Sprite;
 using XEngine.Core.Scenery;
+using static WinFormsUI.Game.Player.PlayerControlHelper;
 
 namespace WinFormsUI.Game.Player.PlayerStates
 {
@@ -16,43 +21,49 @@ namespace WinFormsUI.Game.Player.PlayerStates
 
         public string DebugName => "Aiming";
 
-        public void Enter(GPlayer player)
+        public void Enter(GPlayer player, GScene scene)
         {
-            float x = player.WeaponEntity.Transform.Position2D.X;
-            float y = player.WeaponEntity.Transform.Position2D.Y;
-            player.WeaponEntity.Transform.Position2D = new(x, y + 0.3f);
+            if (player.HeadEntity.TryGet<GSprite>(out var hSprite)) hSprite
+                    .SetTexture(scene.Assets.LoadTexture(player.HeadAiming), true);
+            if (player.BodyEntity.TryGet<GSprite>(out var bSprite)) bSprite
+                    .SetTexture(scene.Assets.LoadTexture(player.BodyAiming), true);
             _isAiming = true;
         }
 
-        public void Exit(GPlayer player)
+        public void Exit(GPlayer player, GScene scene)
         {
-            float x = player.WeaponEntity.Transform.Position2D.X;
-            float y = player.WeaponEntity.Transform.Position2D.Y;
-            player.WeaponEntity.Transform.Position2D = new(x, y - 0.3f);
             player.ShootTimer.Reset();
-            player.SetFacing(new(player.IsRightFacing ? 1 : -1, 0));
+            PlayerHelper.SetFacing(player, new(player.IsRightFacing ? 1 : -1, 0));
+        }
+
+        private void Shoot(GPlayer player, GScene scene, float dt)
+        {
+            var ang = player.IsRightFacing ? _angle : MathF.PI - _angle;
+            var tr = player.WeaponEntity.Transform;
+            scene.Schedule(() =>
+            {
+                (scene as Level1Scene)?.projectileFactory.CreateProjectile("pistol_bullet", player.Name, scene, tr.RelativePosition2D, tr.Rotation);
+            });
         }
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            if (scene.Input.IsActionJustPressed($"shoot{player.Name}"))
+            if (AimStart(player, scene.Input))
             {
                 player.ShootTimer.Reset();
                 _isAiming = true;
             }
 
-            if (scene.Input.IsActionJustReleased($"shoot{player.Name}"))
+            if (AimEnd(player, scene.Input))
             {
-                // shoot
+                Shoot(player, scene, dt);
                 _isAiming = false;
             }
-
-            Debug.WriteLine(player.ShootTimer.Progress);
 
             if (!_isAiming && player.ShootTimer.Progress == 0) player.ShootTimer.Start();
             if (!_isAiming && player.ShootTimer.Progress == 1)
             {
-                player.SwitchTo<IdleState>();
+                player.SwitchTo<IdleState>(scene);
                 return;
             }
 
@@ -67,17 +78,17 @@ namespace WinFormsUI.Game.Player.PlayerStates
                 _angle = Math.Clamp(_angle, -MathF.PI / 2 + Lim, MathF.PI / 2 - Lim);
 
                 var (sin, cos) = MathF.SinCos(_angle);
-                player.SetFacing(new(dir * cos, sin));
+                PlayerHelper.SetFacing(player, new(dir * cos, sin));
                 return;
             }
 
             if ((player.IsRightFacing && right) || (!player.IsRightFacing && left))
             {
-                player.SwitchTo<WalkState>();
+                player.SwitchTo<WalkState>(scene);
                 return;
             }
 
-            player.SetFacing(new(right ? 1 : -1, 0));
+            PlayerHelper.SetFacing(player, new(right ? 1 : -1, 0));
             _angle = 0;
         }
     }

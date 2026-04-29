@@ -1,5 +1,6 @@
 ﻿using Box2D.NET;
 using WinFormsUI.Game.Box2D;
+using WinFormsUI.Game.Config;
 using WinFormsUI.Game.Player.Stats;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat;
@@ -7,26 +8,26 @@ using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Scenery;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace WinFormsUI.Game.Player
 {
-    public static class PlayerFactory
+    public class PlayerFactory(ConfigLoader<PlayerConfig> configLoader)
     {
-        private static readonly B2Vec2 PLAYER_SIZE = new(1f, 2f);
+        private readonly static CollisionFlags PlayerMask = CollisionFlags.GROUND | CollisionFlags.PROJECTILE;
 
-        public static GPlayer CreatePlayer(GScene scene, B2Vec2 pos, string name, IPlayerStats stats)
+        public GPlayer CreatePlayer(GScene scene, B2Vec2 pos, string name, string playerConfigId)
         {
-            var body = CreateBody(scene, pos);
-            var head = CreateHead(scene);
-            var weapon = CreateWeapon(scene);
-            head.Get<GTransform>()!.SetParent(body.Transform);
-            weapon.Get<GTransform>()!.SetParent(body.Transform);
+            if (!configLoader.TryGetConfig(playerConfigId, out var config)) throw new ArgumentException("player Id not found");
 
-            return body.AddComponent<GPlayer>()
-                .Init(scene, stats)
-                .SetName(name)
-                .SetFacing(new(1, 0));
+            var body = CreateBody(scene, pos);
+            CreateHead(scene).Get<GTransform>()!.SetParent(body.Transform);
+            CreateWeapon(scene).Get<GTransform>()!.SetParent(body.Transform);
+
+            var player = body.AddComponent<GPlayer>().Init(scene, config).SetName(name);
+            player.CharacterSpriteName = config.TextureName;
+            PlayerHelper.SetFacing(player, new(1, 0), true);
+
+            return player;
         }
 
         private static Entity CreateBody(GScene scene, B2Vec2 pos)
@@ -35,21 +36,23 @@ namespace WinFormsUI.Game.Player
             e.Transform.Init(new(pos.X, pos.Y, 0), 0f);
             e.AddComponent<GSprite>().SetTranslation(new(0, 0.75f));
 
-            float r = 0.5f * PLAYER_SIZE.X;
+            float r = 0.5f * PlayerHelper.PLAYER_SIZE.X;
             var bodyComp = e.AddComponent<GBox2DBody>()
                 .Init()
                 .SetType(B2BodyType.b2_dynamicBody)
                 .SetMotinLocks(new B2MotionLocks { angularZ = true })
                 .SyncToTransform(e.Transform)
                 .Build(scene.World.Id)
+                .EnableCollisionCallbacks()
                 .AttacShapes(bid => // -- main body --
                 {
-                    B2Capsule capsule = B2HelperMethods.MakeCapsule(new(new(-r, 0), new(r, PLAYER_SIZE.Y)));
+                    B2Capsule capsule = B2Helpers.MakeCapsule(new(new(-r, 0), new(r, PlayerHelper.PLAYER_SIZE.Y)));
                     B2ShapeDef capsuleDef = B2Types.b2DefaultShapeDef();
                     capsuleDef.density = 1f;
                     capsuleDef.material.friction = 0.1f;
+                    capsuleDef.enableSensorEvents = true;
                     capsuleDef.filter.categoryBits = (ulong)CollisionFlags.PLAYER;
-                    capsuleDef.filter.maskBits = (ulong)CollisionFlags.GROUND;
+                    capsuleDef.filter.maskBits = (ulong)PlayerMask;
                     B2Shapes.b2CreateCapsuleShape(bid, capsuleDef, capsule);
                 }).AttacShapes(bid => // -- circle sensor for ground collision --
                 {
@@ -58,16 +61,24 @@ namespace WinFormsUI.Game.Player
                     circleSensorDef.enableSensorEvents = true;
                     circleSensorDef.filter.categoryBits = (ulong)CollisionFlags.FOOT;
                     circleSensorDef.filter.maskBits = (ulong)CollisionFlags.GROUND;
-                    B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, r * 0.9f), r));
+                    B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, r * 0.9f), r * 0.95f));
                 });
-            B2Bodies.b2Body_SetUserData(bodyComp.Id, B2UserData.Ref(new PlayerUserData()));
+            bodyComp.OnCollisionEnter = (ev) =>
+            {
+                if (ev.IsSensor && B2Shapes.b2Shape_GetFilter(ev.ShapeIdA).categoryBits == (ulong)CollisionFlags.FOOT)
+                    ev.GBodyA!.Owner.Get<GPlayer>()!.GroundContacts++;
+            };
+            bodyComp.OnCollisionExit = (ev) =>
+            {
+                if (ev.IsSensor && B2Shapes.b2Shape_GetFilter(ev.ShapeIdA).categoryBits == (ulong)CollisionFlags.FOOT)
+                    ev.GBodyA!.Owner.Get<GPlayer>()!.GroundContacts--;
+            };
             return e;
         }
 
         private static Entity CreateHead(GScene scene)
         {
             var e = scene.CreateEntity();
-            e.Transform.Init(new(0, PLAYER_SIZE.Y * 0.75f, 0), 0f);
             e.AddComponent<GSprite>();
             return e;
         }
@@ -75,8 +86,7 @@ namespace WinFormsUI.Game.Player
         private static Entity CreateWeapon(GScene scene)
         {
             var e = scene.CreateEntity();
-            e.Transform.Init(new(0, PLAYER_SIZE.Y * 0.5f, 0), 0f);
-            e.AddComponent<GSprite>().SetTranslation(new(PLAYER_SIZE.X * 0.25f, 0));
+            e.AddComponent<GSprite>();
             return e;
         }
     }

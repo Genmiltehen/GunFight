@@ -10,7 +10,7 @@ namespace XEngine.Core.Graphics
         private readonly Dictionary<string, Texture2D> _sceneTextures = [];
         private bool _disposed = false;
 
-        public readonly string RootPath = Path.GetFullPath(AssetPath);
+        public string RootPath { get; } = Path.GetFullPath(AssetPath);
         public string ShaderPath => Path.Combine(RootPath, "Shaders");
 
         public void Init()

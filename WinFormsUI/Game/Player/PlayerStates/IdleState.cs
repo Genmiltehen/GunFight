@@ -1,13 +1,8 @@
 ﻿using Box2D.NET;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using XEngine.Core.Box2DCompat.Components;
+using XEngine.Core.Common.Sprite;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils;
+using static WinFormsUI.Game.Player.PlayerControlHelper;
 
 namespace WinFormsUI.Game.Player.PlayerStates
 {
@@ -15,9 +10,15 @@ namespace WinFormsUI.Game.Player.PlayerStates
     {
         public string DebugName => "Idling";
 
-        public void Enter(GPlayer player) { }
+        public void Enter(GPlayer player, GScene scene)
+        {
+            if (player.HeadEntity.TryGet<GSprite>(out var hSprite)) hSprite
+                    .SetTexture(scene.Assets.LoadTexture(player.HeadIdle), true);
+            if (player.BodyEntity.TryGet<GSprite>(out var bSprite)) bSprite
+                    .SetTexture(scene.Assets.LoadTexture(player.BodyIdle), true);
+        }
 
-        public void Exit(GPlayer player) { }
+        public void Exit(GPlayer player, GScene scene) { }
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
@@ -28,22 +29,22 @@ namespace WinFormsUI.Game.Player.PlayerStates
                 B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2body.Id, new(0, player.Stats.JumpPower), true);
             }
 
-            if (!player.IsOnGround())
+            if (!IsOnGround(player))
             {
-                player.SwitchTo<FallState>();
+                player.SwitchTo<FallState>(scene);
                 return;
             }
 
-            if (player.HorizontalInput(scene.Input) != 0)
+            if (HorizotnalInput(player, scene.Input) != 0)
             {
-                player.SwitchTo<WalkState>();
+                player.SwitchTo<WalkState>(scene);
                 return;
             }
 
             var shoot = scene.Input.IsActionActive($"shoot{player.Name}");
             if (shoot)
             {
-                player.SwitchTo<AimState>();
+                player.SwitchTo<AimState>(scene);
                 return;
             }
         }

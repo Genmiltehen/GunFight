@@ -1,4 +1,5 @@
 ﻿using Box2D.NET;
+using System.Diagnostics;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;
@@ -57,7 +58,7 @@ namespace XEngine.Core.Scenery
 
         public void RegisterTimer(GameTimer timer)
         {
-            _timers.Add(timer);
+            if (!_timers.Contains(timer)) _timers.Add(timer);
         }
 
         public void RemoveTimer(GameTimer timer)
@@ -101,6 +102,7 @@ namespace XEngine.Core.Scenery
         private void InvokeEvents()
         {
             foreach (var action in actions) action.Invoke();
+            actions.Clear();
         }
 
         private void RemoveDeleted()

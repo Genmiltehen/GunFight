@@ -10,8 +10,8 @@ namespace WinFormsUI.Game.Player.PlayerStates
     public interface IPlayerState
     {
         public string DebugName { get; }
-        public void Enter(GPlayer player);
+        public void Enter(GPlayer player, GScene scene);
         public void ProcessInput(GPlayer player, GScene scene, float dt);
-        public void Exit(GPlayer player);
+        public void Exit(GPlayer player, GScene scene);
     }
 }

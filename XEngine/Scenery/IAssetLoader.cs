@@ -4,6 +4,7 @@ namespace XEngine.Core.Scenery
 {
     public interface IAssetLoader
     {
-        Texture2D LoadTexture(string path, bool persistent = false);
+        public Texture2D LoadTexture(string path, bool persistent = false);
+        public string RootPath { get; }
     }
 }

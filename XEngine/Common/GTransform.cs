@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
+using XEngine.Core.Utils.Maths;
 
 namespace XEngine.Core.Common
 {
@@ -82,6 +83,8 @@ namespace XEngine.Core.Common
             set => Position = new Vector3(value.X, value.Y, _position.Z);
         }
 
+        public Vector2 RelativePosition2D => Parent != null ? (MathUtils.Homogenize(_position) * Parent.GetWorldMatrix()).Xy : Position2D;
+
         public Vector3 Position
         {
             get => _position;
@@ -130,6 +133,11 @@ namespace XEngine.Core.Common
                 _isDirty = false;
             }
             return _cachedMatrix;
+        }
+
+        public override string ToString()
+        {
+            return $"[{_position}] ({_rotation:F2}rad)";
         }
     }
 }

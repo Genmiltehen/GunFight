@@ -48,11 +48,11 @@ namespace XEngine.Core
             _glProvider.LoadShader("NineSlice", "NineSlice");
 
             var spriteRenderer = new SpriteRendererModule(_glProvider);
-            var debugRenderer = new Box2DBodyRender(_glProvider);
             var nineslicerenderer = new NineSliceRendererModule(_glProvider);
+            //var debugRenderer = new Box2DBodyRender(_glProvider);
             _renderPipeline.AddRenderModule(spriteRenderer);
-            _renderPipeline.AddRenderModule(debugRenderer);
             _renderPipeline.AddRenderModule(nineslicerenderer);
+            //_renderPipeline.AddRenderModule(debugRenderer);
 
             _input.LoadBindingsFromConfig(_config);
         }

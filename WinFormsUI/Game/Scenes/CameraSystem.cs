@@ -5,7 +5,7 @@ using XEngine.Core.Base;
 using XEngine.Core.Common;
 using XEngine.Core.Scenery;
 
-namespace WinFormsUI.Game
+namespace WinFormsUI.Game.Scenes
 {
     internal class CameraSystem : IGameSystem
     {

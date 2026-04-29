@@ -15,6 +15,8 @@ namespace XEngine.Core.Common.Sprite
         protected Matrix4 _modelMatrix = Matrix4.Identity;
         protected bool _isDirty = true;
         public bool IsUseTextureSize { get; protected set; } = false;
+        public bool FlipX = false;
+        public bool FlipY = false;
 
         public GSprite SetTexture(Texture2D texture, bool useTextureSize)
         {

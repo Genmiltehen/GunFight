@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinFormsUI.Game.Box2D
+namespace WinFormsUI.Game.Config
 {
-    internal class PlayerUserData
+    public interface IIdentifilable
     {
-        public int GroundCollisions = 0;
+        string Id { get; }
     }
 }

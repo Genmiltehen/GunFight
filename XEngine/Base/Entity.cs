@@ -37,14 +37,14 @@ namespace XEngine.Core.Base
             return true;
         }
 
-        public void Remove()
+        public void MarkDelete()
         {
             _isDeleted = true;
 
             Entity? current = Transform.FirstChild?.Owner;
             while (current != null)
             {
-                current.Remove();
+                current.MarkDelete();
                 current = current.Transform.NextSibling?.Owner;
             }
         }

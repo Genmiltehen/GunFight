@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using XEngine.Core.Box2DCompat.Components;
 using static Box2D.NET.B2MathFunction;
 
 namespace XEngine.Core.Box2DCompat
 {
-    public static class B2HelperMethods
+    public static class B2Helpers
     {
         public static B2Capsule MakeCapsule(B2AABB aabb)
         {

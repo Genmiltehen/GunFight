@@ -32,11 +32,14 @@ namespace XEngine.Core.Common.Sprite
             _provider.UnitQuad.Bind();
             foreach (var (_, tr, sprite) in scene.Query<GTransform, GSprite>())
             {
+                if (sprite.Texture == null) continue;
+
                 sprite.UseTexture();
 
                 var ts = sprite.TextureSize;
                 var texSize = sprite.IsUseTextureSize ? Matrix4.CreateScale(ts.X, ts.Y, 1) : Matrix4.Identity;
-                var modelMatrix = scene.World.PPMScale * texSize * sprite.GetModelMatrix() * tr.GetWorldMatrix();
+                var flips = Matrix4.CreateScale(sprite.FlipX ? -1 : 1, sprite.FlipY ? -1 : 1, 1);
+                var modelMatrix = scene.World.PPMScale * flips * texSize * sprite.GetModelMatrix() * tr.GetWorldMatrix();
                 _spriteShader.SetMatrix4("uModel", modelMatrix);
 
                 _provider.UnitQuad.Draw();
