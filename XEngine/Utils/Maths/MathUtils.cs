@@ -14,6 +14,18 @@ namespace XEngine.Core.Utils.Maths
     {
         public const float Epsilon = 1e-6f;
 
+        public static Vector2 FromPolar(float rho, float theta)
+        {
+            var (s, c) = MathF.SinCos(theta);
+            return rho * new Vector2(c, s);
+        }
+
+        public static Vector2 Rotate(Vector2 v, float angle)
+        {
+            var (s, c) = MathF.SinCos(angle);
+            return new Vector2(c * v.X + s * v.Y, -s * v.X + c * v.Y);
+        }
+
         public static Vector4 Homogenize(Vector3 v) => new(v.X, v.Y, v.X, 1);
         public static Vector3 Dehomogenize(Vector4 v) => v.Xyz / v.W;
 

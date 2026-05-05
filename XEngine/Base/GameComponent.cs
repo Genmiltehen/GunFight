@@ -2,6 +2,6 @@
 {
     public abstract class GameComponent
     {
-        public Entity Owner { get; internal set; }
+        public Entity Owner { get; internal set; } = null!;
     }
 }

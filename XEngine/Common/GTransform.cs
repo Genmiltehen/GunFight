@@ -30,9 +30,9 @@ namespace XEngine.Core.Common
 
         public void SetParent(GTransform? newParent)
         {
-            if (Owner.Get<GBox2DBody>() is not null)
+            if (newParent != null &&  Owner.Get<GBox2DBody>() is not null)
             {
-                throw new InvalidOperationException("Cant link entity's transform with Box2DBody, use Box2D constraint");
+                throw new InvalidOperationException("Can not link entity's transform with Box2DBody, use Box2D constraint");
             }
 
             if (Parent != null)
@@ -61,7 +61,7 @@ namespace XEngine.Core.Common
                 count++;
                 current = current.NextSibling;
             }
-            throw new System.IndexOutOfRangeException();
+            throw new IndexOutOfRangeException();
         }
 
         public void SetDirty()
@@ -81,6 +81,12 @@ namespace XEngine.Core.Common
         {
             get => new(_position.X, _position.Y);
             set => Position = new Vector3(value.X, value.Y, _position.Z);
+        }
+
+        public float Layer
+        {
+            get => _position.Z;
+            set => Position = new Vector3(_position.X, _position.Y, value);
         }
 
         public Vector2 RelativePosition2D => Parent != null ? (MathUtils.Homogenize(_position) * Parent.GetWorldMatrix()).Xy : Position2D;

@@ -18,7 +18,7 @@ namespace WinFormsUI.Game.Scenes
         {
             var _groundTex = scene.Assets.LoadTexture("Environment\\GroundOrange.png");
 
-            var ground = scene.CreateEntity();
+            var ground = scene.SpawnEntity();
             ground.Transform.Init(new(pos.X, pos.Y, 0), rotation);
             ground.AddComponent<GNineSlice>()
                 .SetTexture(_groundTex, false)
@@ -48,7 +48,7 @@ namespace WinFormsUI.Game.Scenes
         {
             var _boxTex = scene.Assets.LoadTexture("Environment\\Box.png");
 
-            var box = scene.CreateEntity();
+            var box = scene.SpawnEntity();
             box.Transform.Init(new(pos.X, pos.Y, 0), rotation);
             box.AddComponent<GNineSlice>()
                 .SetBorders(8)

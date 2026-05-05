@@ -1,4 +1,5 @@
 ﻿using OpenTK.Windowing.Desktop;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using XEngine.Core.Common.Sprite;
@@ -26,16 +27,19 @@ namespace XEngine.Core
         public SceneManager SceneManager => _sceneManager;
         public RenderPipeline Renderer => _renderPipeline;
         public InputManager Input => _input;
+        public GLProvider GLProvider => _glProvider;
 
         public GameConfig _config;
 
-        public GameEngine(string AssetPath)
+        public GameEngine()
         {
-            _assets = new AssetManager(AssetPath);
-            _glProvider = new GLProvider(Path.Combine(AssetPath, "Shaders"));
+            _assets = new AssetManager();
             _sceneManager = new SceneManager(_assets);
             _renderPipeline = new RenderPipeline();
             _input = new InputManager();
+
+            string AssetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
+            _glProvider = new GLProvider(Path.Combine(AssetPath, "Shaders"));
             _config = new ConfigManager().Load(Path.Combine(AssetPath, "config.json"));
         }
 
@@ -47,12 +51,12 @@ namespace XEngine.Core
             _glProvider.LoadShader("Line", "Line");
             _glProvider.LoadShader("NineSlice", "NineSlice");
 
-            var spriteRenderer = new SpriteRendererModule(_glProvider);
-            var nineslicerenderer = new NineSliceRendererModule(_glProvider);
-            //var debugRenderer = new Box2DBodyRender(_glProvider);
+            SpriteRendererModule spriteRenderer = new(_glProvider);
+            NineSliceRendererModule nineslicerenderer = new(_glProvider);
+            Box2DBodyRender debugRenderer = new(_glProvider) { IsEnabled = true };
             _renderPipeline.AddRenderModule(spriteRenderer);
             _renderPipeline.AddRenderModule(nineslicerenderer);
-            //_renderPipeline.AddRenderModule(debugRenderer);
+            _renderPipeline.AddRenderModule(debugRenderer);
 
             _input.LoadBindingsFromConfig(_config);
         }

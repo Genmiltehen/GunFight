@@ -21,10 +21,17 @@ namespace XEngine.Core.Input
             foreach (var key in _downKeys) _previousDownKeys.Add(key);
         }
 
+        public bool IsActionInactive(string actionName)
+        {
+            if (!_actionBindings.TryGetValue(actionName, out var keys)) return false;
+            foreach (var key in keys) if (_downKeys.Contains(key) || _previousDownKeys.Contains(key)) return false;
+            return true;
+        }
+
         public bool IsActionActive(string actionName)
         {
             if (!_actionBindings.TryGetValue(actionName, out var keys)) return false;
-            foreach (var key in keys) if (_downKeys.Contains(key)) return true;
+            foreach (var key in keys) if (_downKeys.Contains(key) && _previousDownKeys.Contains(key)) return true;
             return false;
         }
 

@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using StbImageSharp;
 
 namespace XEngine.Core.Graphics.OpenGL
@@ -8,6 +9,7 @@ namespace XEngine.Core.Graphics.OpenGL
         public int Handle { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public Vector2 Size => new(Width, Height);
         private bool _disposed;
 
         public bool IsValid => !_disposed;

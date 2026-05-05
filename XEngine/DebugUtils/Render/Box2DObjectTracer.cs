@@ -1,4 +1,5 @@
 ﻿using Box2D.NET;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace XEngine.Core.DebugUtils.Render
 {
     internal static class Box2DObjectTracer
     {
-        public static void TraceBody(B2BodyId bodyId, LineBatcher lb)
+        public static void TraceBody(B2BodyId bodyId, LineBatcher lb, Vector4 color)
         {
             B2Transform transform = B2Bodies.b2Body_GetTransform(bodyId);
 
@@ -23,28 +24,25 @@ namespace XEngine.Core.DebugUtils.Render
             Span<B2ShapeId> shapeIds = new B2ShapeId[shapeCount];
             B2Bodies.b2Body_GetShapes(bodyId, shapeIds, shapeCount);
 
-            foreach (var shapeId in shapeIds) TraceShape(shapeId, transform, lb);
+            foreach (var shapeId in shapeIds) TraceShape(shapeId, transform, lb, color);
         }
 
-        private static void TraceShape(B2ShapeId shapeId, B2Transform transform, LineBatcher lb)
+        private static void TraceShape(B2ShapeId shapeId, B2Transform transform, LineBatcher lb, Vector4 color)
         {
-            using (lb.TraceLine(closed: true))
+            switch (B2Shapes.b2Shape_GetType(shapeId))
             {
-                switch (B2Shapes.b2Shape_GetType(shapeId))
-                {
-                    case B2ShapeType.b2_circleShape:
-                        TraceSegment(lb, B2Shapes.b2Shape_GetSegment(shapeId), transform);
-                        break;
-                    case B2ShapeType.b2_capsuleShape:
-                        TraceCapsule(lb, B2Shapes.b2Shape_GetCapsule(shapeId), transform);
-                        break;
-                    case B2ShapeType.b2_segmentShape:
-                        TraceCircle(lb, B2Shapes.b2Shape_GetCircle(shapeId), transform);
-                        break;
-                    case B2ShapeType.b2_polygonShape:
-                        TracePolygon(lb, B2Shapes.b2Shape_GetPolygon(shapeId), transform);
-                        break;
-                }
+                case B2ShapeType.b2_circleShape:
+                    TraceCircle(lb, B2Shapes.b2Shape_GetCircle(shapeId), transform, color);
+                    break;
+                case B2ShapeType.b2_capsuleShape:
+                    TraceCapsule(lb, B2Shapes.b2Shape_GetCapsule(shapeId), transform, color);
+                    break;
+                case B2ShapeType.b2_segmentShape:
+                    TraceSegment(lb, B2Shapes.b2Shape_GetSegment(shapeId), transform, color);
+                    break;
+                case B2ShapeType.b2_polygonShape:
+                    TracePolygon(lb, B2Shapes.b2Shape_GetPolygon(shapeId), transform, color);
+                    break;
             }
         }
 
@@ -59,14 +57,17 @@ namespace XEngine.Core.DebugUtils.Render
             }
         }
 
-        private static void TraceSegment(LineBatcher lb, B2Segment seg, B2Transform tr)
+        private static void TraceSegment(LineBatcher lb, B2Segment seg, B2Transform tr, Vector4 color)
         {
-            lb.AddPoint(b2TransformPoint(tr, seg.point1));
-            lb.AddPoint(b2TransformPoint(tr, seg.point2));
+            using (lb.TraceLine(closed: false))
+            {
+                lb.AddPoint(b2TransformPoint(tr, seg.point1), color);
+                lb.AddPoint(b2TransformPoint(tr, seg.point2), color);
+            }
         }
 
         private readonly static int PolyRes = 8;
-        private static void TracePolygon(LineBatcher lb, B2Polygon poly, B2Transform tr)
+        private static void TracePolygon(LineBatcher lb, B2Polygon poly, B2Transform tr, Vector4 color)
         {
             B2Vec2[] points = new B2Vec2[PolyRes + 1];
             B2Vec2 prev = b2TransformPoint(tr, poly.vertices[poly.count - 1]);
@@ -74,16 +75,20 @@ namespace XEngine.Core.DebugUtils.Render
             B2Vec2 next = b2TransformPoint(tr, poly.vertices[1]);
             GetAngles(prev, curr, next, out float start, out float end);
             CalcArc(ref points, poly.radius, start, end);
-            for (int i = 0; i <= PolyRes; i++) lb.AddPoint(b2Add(points[i], curr));
 
-            for (int i = 1; i < poly.count; i++)
+            using (lb.TraceLine(closed: true))
             {
-                prev = curr;
-                curr = next;
-                next = b2TransformPoint(tr, poly.vertices[(i + 1) % poly.count]);
-                GetAngles(prev, curr, next, out start, out end);
-                CalcArc(ref points, poly.radius, start, end);
-                for (int j = 0; j <= PolyRes; j++) lb.AddPoint(b2Add(points[j], curr));
+                for (int i = 0; i <= PolyRes; i++) lb.AddPoint(b2Add(points[i], curr), color);
+
+                for (int i = 1; i < poly.count; i++)
+                {
+                    prev = curr;
+                    curr = next;
+                    next = b2TransformPoint(tr, poly.vertices[(i + 1) % poly.count]);
+                    GetAngles(prev, curr, next, out start, out end);
+                    CalcArc(ref points, poly.radius, start, end);
+                    for (int j = 0; j <= PolyRes; j++) lb.AddPoint(b2Add(points[j], curr), color);
+                }
             }
         }
 
@@ -95,7 +100,7 @@ namespace XEngine.Core.DebugUtils.Render
         }
 
         private readonly static int CapRes = 8;
-        private static void TraceCapsule(LineBatcher lb, B2Capsule capsule, B2Transform tr)
+        private static void TraceCapsule(LineBatcher lb, B2Capsule capsule, B2Transform tr, Vector4 color)
         {
             float capAng = b2Atan2(
                 capsule.center1.Y - capsule.center2.Y,
@@ -103,19 +108,29 @@ namespace XEngine.Core.DebugUtils.Render
             ) - MathF.PI / 2;
 
             B2Vec2[] points = new B2Vec2[CapRes + 1];
-            CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
-            for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], b2TransformPoint(tr, capsule.center1)));
-            capAng += MathF.PI;
-            CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
-            for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], b2TransformPoint(tr, capsule.center2)));
+            B2Vec2 c1 = b2TransformPoint(tr, capsule.center1);
+            B2Vec2 c2 = b2TransformPoint(tr, capsule.center2);
+
+            using (lb.TraceLine(closed: true))
+            {
+                CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
+                for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], c1), color);
+                capAng += MathF.PI;
+                CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
+                for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], c2), color);
+            }
         }
 
         private readonly static int CircRes = 16;
-        private static void TraceCircle(LineBatcher lb, B2Circle circle, B2Transform tr)
+        private static void TraceCircle(LineBatcher lb, B2Circle circle, B2Transform tr, Vector4 color)
         {
             B2Vec2[] points = new B2Vec2[CircRes + 1];
+            B2Vec2 c0 = b2TransformPoint(tr, circle.center);
             CalcArc(ref points, circle.radius, 0, MathF.Tau);
-            for (int i = 0; i <= CircRes; i++) lb.AddPoint(b2Add(points[i], b2TransformPoint(tr, circle.center)));
+            using (lb.TraceLine(closed: true))
+            {
+                for (int i = 0; i <= CircRes; i++) lb.AddPoint(b2Add(points[i], c0), color);
+            }
         }
     }
 }

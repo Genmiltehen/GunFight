@@ -5,12 +5,14 @@
 		"sitA": "S",
 		"leftA": "A",
 		"rightA": "D",
-		"shootA": "LeftShift",
+		"aimA": "LeftShift",
+		"actA": "E",
 		"jumpB": "I",
 		"sitB": "K",
 		"leftB": "J",
 		"rightB": "L",
-		"shootB": "Space"
+		"aimB": "Space",
+		"actB": "U"
 	},
 	"axes": {
 		"HorizontalA": {

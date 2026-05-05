@@ -26,7 +26,7 @@ namespace WinFormsUI.Game.Config
 
             foreach (var config in configs)
                 if (!_database.TryAdd(config.Id, config))
-                    Debug.WriteLine($"Warning: Duplicate ID '{config.Id}' ignored.");
+                    Debug.WriteLine($"[Warn]: Duplicate ID '{config.Id}' ignored.");
         }
 
         public bool TryGetConfig(string Id, out T res)

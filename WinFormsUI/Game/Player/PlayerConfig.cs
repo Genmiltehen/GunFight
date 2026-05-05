@@ -14,11 +14,13 @@ namespace WinFormsUI.Game.Player
         public float Armor { get; set; }
         public float MaxHealth { get; set; }
         public float HealthRegenRate { get; set; }
+        public float HealthRegenDelay { get; set; }
 
         public float Speed { get; set; }
         public float Acceleration { get; set; }
         public float JumpPower { get; set; }
 
+        public string StartWeaponId { get; set; } = "";
         public string TextureName { get; set; } = "";
         //public string FootstepSound { get; set; } = "";
     }

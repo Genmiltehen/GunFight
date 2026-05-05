@@ -11,14 +11,11 @@ namespace WinFormsUI.Game.Combat.Projectiles
 {
     public class GProjectile : GameComponent
     {
-        public GameTimer LifeTimer = new(0);
         public string Source { get; set; } = null!;
         public float Damage { get; set; } = 0;
 
-        public GProjectile Init(ProjectileConfig config, GScene scene)
+        public GProjectile Init(ProjectileConfig config)
         {
-            scene.RegisterTimer(LifeTimer);
-            LifeTimer.Duration = config.MaxLifetime;
             Damage = config.Damage;
             return this;
         }

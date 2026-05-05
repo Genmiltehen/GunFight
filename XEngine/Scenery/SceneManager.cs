@@ -2,21 +2,15 @@
 
 namespace XEngine.Core.Scenery
 {
-    public sealed class SceneManager : IDisposable
+    public sealed class SceneManager(AssetManager assets) : IDisposable
     {
-        private readonly AssetManager _assets;
         private bool _disposed = false;
         public GScene? CurrentScene { get; private set; }
-
-        public SceneManager(AssetManager assets)
-        {
-            _assets = assets;
-        }
 
         public void SwitchTo(GScene newScene)
         {
             CurrentScene?.Unload();
-            _assets.UnloadSceneAssets();
+            assets.UnloadSceneAssets();
 
             newScene.Load();
             CurrentScene = newScene;

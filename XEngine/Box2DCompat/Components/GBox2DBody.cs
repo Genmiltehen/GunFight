@@ -12,7 +12,7 @@ using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Box2DCompat.Components
 {
-    public sealed class GBox2DBody : GameComponent, IDisposable
+    public sealed class GBox2DBody : GameComponent, System.IDisposable
     {
         private bool _disposed = false;
         private bool _isCollisionCallbackEnabled = false;

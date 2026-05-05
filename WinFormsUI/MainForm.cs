@@ -5,6 +5,7 @@ using WinFormsUI.Game;
 using WinFormsUI.Game.Input;
 using WinFormsUI.Game.Scenes;
 using XEngine.Core;
+using XEngine.Core.Common.Trace;
 using XEngine.Core.Graphics.OpenGL;
 
 namespace WinFormsUI
@@ -23,11 +24,8 @@ namespace WinFormsUI
         public MainForm()
         {
             InitializeComponent();
-
-            string assetsPath = Path.Combine("D:\\!!GSTU\\C2\\S2\\!Kurs\\GunFight", "Assets"); // change to Application Directory
-            _engine = new GameEngine(assetsPath);
-
-            this.KeyPreview = true;
+            _engine = new GameEngine();
+            KeyPreview = true;
         }
 
         private void MainFormLoad(object sender, EventArgs e)
@@ -35,6 +33,8 @@ namespace WinFormsUI
             Debug.WriteLine("formload");
             int width = ClientSize.Width;
             int height = ClientSize.Height;
+
+            _engine.Renderer.AddRenderModule(new TracerRenderModule(_engine.GLProvider));
             _engine.Renderer.SetViewport(width, height);
 
             _engine.SceneManager.SwitchTo(new Level1Scene(_engine));
@@ -49,7 +49,8 @@ namespace WinFormsUI
         private void OnGLLoad(object sender, EventArgs e)
         {
             Debug.WriteLine("glload");
-            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Blend | EnableCap.DepthTest);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.ClearColor(Color.Black);
 

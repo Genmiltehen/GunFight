@@ -21,19 +21,13 @@ namespace WinFormsUI.Game.Scenes
 
         public void Update(GScene _scene, float _dt)
         {
-            Vector2 pA = _scene.Query<GTransform, GPlayer>((_, _, plr) => plr.Name == "A").First().Item2.Position2D;
-            Vector2 pB = _scene.Query<GTransform, GPlayer>((_, _, plr) => plr.Name == "B").First().Item2.Position2D;
+            Vector2 center = new(0, 0);
+            var E = _scene.Query<GTransform>((e, _) => e.Has<GPlayer>());
+            foreach (var (_, tr) in E) center += tr.Position2D;
+            center /= E.Count();
+            var radius = E.Select(e => (center - e.Item2.Position2D).Length).Max();
 
-            Vector2 center = (pA + pB) / 2f;
-            float distance = Vector2.Distance(pA, pB);
-
-            _scene.Camera.Approach(new(center.X, center.Y, distance + _padding), 2f * _dt);
-
-            //_scene.Camera.Zoom
-
-            //// Adjust orthographic size based on distance
-            //camera.orthographicSize = float.Lerp(camera.orthographicSize, targetSize, smoothSpeed);
-            //camera.transform.position = new Vector3(center.x, center.y, camera.transform.position.z);
+            _scene.Camera.Approach(new(center.X, center.Y, radius * 2 + _padding), 2f * _dt);
         }
     }
 }

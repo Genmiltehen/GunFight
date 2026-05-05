@@ -1,4 +1,5 @@
 ﻿using Box2D.NET;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System.Diagnostics;
 using XEngine.Core.Box2DCompat;
@@ -19,6 +20,7 @@ namespace XEngine.Core.DebugUtils.Render
 
         public Box2DBodyRender(GLProvider glProvider)
         {
+            IsEnabled = false;
             _glProvider = glProvider;
             _line_shader = _glProvider.GetShader("Line");
         }
@@ -29,15 +31,12 @@ namespace XEngine.Core.DebugUtils.Render
 
             _line_shader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
             _line_shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
-            _line_shader.SetVector3("uColor", new(1, 0, 0));
 
-            foreach (var (_, b2b) in scene.Query<GBox2DBody>())
-            {
-                Box2DObjectTracer.TraceBody(b2b.Id, _glProvider.LineBatcher);
-            }
+            foreach (var (_, b2b) in scene.Query<GBox2DBody>()) Box2DObjectTracer.TraceBody(b2b.Id, _glProvider.LineBatcher, new(1, 0, 0, 1));
 
             _glProvider.LineBatcher.Draw();
             _glProvider.LineBatcher.Clear();
+            GL.BindVertexArray(0);
         }
     }
 }

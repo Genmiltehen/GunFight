@@ -7,19 +7,14 @@ using System.Threading.Tasks;
 
 namespace XEngine.Core.Graphics.OpenGL
 {
-    public sealed class GLProvider : IDisposable
+    public sealed class GLProvider(string shaderFolder) : IDisposable
     {
         private readonly Dictionary<string, Shader> _shaders = [];
         private bool _disposed = false;
 
-        public readonly string ShaderFolder;
+        public readonly string ShaderFolder = shaderFolder;
         public UnitQuad UnitQuad { get; private set; } = new UnitQuad();
         public LineBatcher LineBatcher { get; private set; } = new LineBatcher();
-
-        public GLProvider(string shaderFolder)
-        {
-            ShaderFolder = shaderFolder;
-        }
 
         public void Init()
         {

@@ -8,6 +8,7 @@ namespace XEngine.Core.Input
 {
     public interface IInputService
     {
+        public bool IsActionInactive(string actionName);
         public bool IsActionActive(string actionName);
         public bool IsActionJustPressed(string actionName);
         public bool IsActionJustReleased(string actionName);

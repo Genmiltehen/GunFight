@@ -1,84 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using WinFormsUI.Game.Scenes;
-using XEngine.Core.Common.Sprite;
+﻿using WinFormsUI.Game.Combat.Weapons;
 using XEngine.Core.Scenery;
-using static WinFormsUI.Game.Player.PlayerControlHelper;
+using static WinFormsUI.Game.Player.Contol.ActionType;
 
 namespace WinFormsUI.Game.Player.PlayerStates
 {
     internal class AimState : IPlayerState
     {
-        private float _angle = 0;
         private const float Lim = 0.05f;
-        private bool _isAiming;
+        private const float LowerLimit = -MathF.PI / 2 + Lim;
+        private const float UpperLimit = MathF.PI / 2 - Lim;
+        private float _angle = 0;
 
         public string DebugName => "Aiming";
 
         public void Enter(GPlayer player, GScene scene)
         {
-            if (player.HeadEntity.TryGet<GSprite>(out var hSprite)) hSprite
-                    .SetTexture(scene.Assets.LoadTexture(player.HeadAiming), true);
-            if (player.BodyEntity.TryGet<GSprite>(out var bSprite)) bSprite
-                    .SetTexture(scene.Assets.LoadTexture(player.BodyAiming), true);
-            _isAiming = true;
-        }
-
-        public void Exit(GPlayer player, GScene scene)
-        {
-            player.ShootTimer.Reset();
-            PlayerHelper.SetFacing(player, new(player.IsRightFacing ? 1 : -1, 0));
-        }
-
-        private void Shoot(GPlayer player, GScene scene, float dt)
-        {
-            var ang = player.IsRightFacing ? _angle : MathF.PI - _angle;
-            var tr = player.WeaponEntity.Transform;
-            scene.Schedule(() =>
-            {
-                (scene as Level1Scene)?.projectileFactory.CreateProjectile("pistol_bullet", player.Name, scene, tr.RelativePosition2D, tr.Rotation);
-            });
-        }
-
-        public void ProcessInput(GPlayer player, GScene scene, float dt)
-        {
-            if (AimStart(player, scene.Input))
-            {
-                player.ShootTimer.Reset();
-                _isAiming = true;
-            }
-
-            if (AimEnd(player, scene.Input))
-            {
-                Shoot(player, scene, dt);
-                _isAiming = false;
-            }
-
-            if (!_isAiming && player.ShootTimer.Progress == 0) player.ShootTimer.Start();
-            if (!_isAiming && player.ShootTimer.Progress == 1)
+            if (player.Weaponry.HeldWeapon == null)
             {
                 player.SwitchTo<IdleState>(scene);
                 return;
             }
 
-            var left = scene.Input.IsActionJustPressed($"left{player.Name}");
-            var right = scene.Input.IsActionJustPressed($"right{player.Name}");
+            player.Model.SetAiming();
+            player.Model.SetWeaponTexture(player.Weaponry.HeldWeapon);
+        }
+
+        public void Exit(GPlayer player, GScene scene)
+        {
+            player.Model.SetFacingDiecration(new(player.IsRightFacing ? 1 : -1, 0));
+            player.Model.SetWeaponTexture();
+        }
+
+        public void ProcessInput(GPlayer player, GScene scene, float dt)
+        {
+            if (player.Control.Fetch("aim", ActionInactive))
+            {
+                player.SwitchTo<IdleState>(scene);
+                return;
+            }
+
+            if (player.Control.Fetch("act", ActionActive)) player.Weaponry.Shoot();
+
+            var left = player.Control.Fetch("left", ActionStart);
+            var right = player.Control.Fetch("right", ActionStart);
 
             if (!(left || right))
             {
-                var ver = scene.Input.GetAxis($"Vertical{player.Name}");
-                var dir = player.IsRightFacing ? 1 : -1;
-                _angle += ver * dt;
-                _angle = Math.Clamp(_angle, -MathF.PI / 2 + Lim, MathF.PI / 2 - Lim);
+                _angle = Math.Clamp(_angle + player.Control.VerticalInput() * dt, LowerLimit, UpperLimit);
 
                 var (sin, cos) = MathF.SinCos(_angle);
-                PlayerHelper.SetFacing(player, new(dir * cos, sin));
+                player.Model.SetFacingDiecration(new((player.IsRightFacing ? 1 : -1) * cos, sin));
                 return;
             }
 
@@ -88,7 +59,7 @@ namespace WinFormsUI.Game.Player.PlayerStates
                 return;
             }
 
-            PlayerHelper.SetFacing(player, new(right ? 1 : -1, 0));
+            player.IsRightFacing = player.Model.SetFacingDiecration(new(right ? 1 : -1, 0));
             _angle = 0;
         }
     }

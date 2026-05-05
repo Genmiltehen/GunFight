@@ -20,6 +20,8 @@ namespace XEngine.Core.Scenery
 
         public readonly IInputService Input;
         public readonly IAssetLoader Assets;
+        public readonly Random Random;
+        public float GetRandomFloat() => (float)Random.NextDouble();
         public GCamera Camera { get; }
         public GBox2DWorld World { get; }
 
@@ -27,60 +29,56 @@ namespace XEngine.Core.Scenery
         {
             Assets = _engine.Assets;
             Input = _engine.Input;
+            Random = new Random();
 
-            var _cam = CreateEntity();
+            var _cam = SpawnEntity();
             Camera = _cam.AddComponent<GCamera>();
             _cam.Transform.Init(new(0, 0, 30), 0);
 
-            var _wld = CreateEntity();
+            var _wld = SpawnEntity();
             World = _wld.AddComponent<GBox2DWorld>().Init(pixelPerMetre: 16, gravity: new B2Vec2(0, -18));
         }
 
-        public Entity CreateEntity()
+        public Entity SpawnEntity()
         {
             int id = _id++;
-            var _e = new Entity(id);
+            var _e = new Entity(id, this);
             _entities[id] = _e;
             return _e;
         }
 
+        #region System
         public void AddSystem(IGameSystem system)
         {
             _systems.Add(system);
             _systems.Sort((a, b) => a.Priority.CompareTo(b.Priority));
         }
-
         public void RemoveSystem(IGameSystem system)
         {
             _systems.Remove(system);
         }
+        #endregion
 
-
-        public void RegisterTimer(GameTimer timer)
-        {
-            if (!_timers.Contains(timer)) _timers.Add(timer);
-        }
-
-        public void RemoveTimer(GameTimer timer)
-        {
-            _timers.Remove(timer);
-        }
-
-        public void Schedule(Action action)
-        {
-            actions.Add(action);
-        }
-
-
-
+        #region Context
         public virtual void Load() { }
         public void Unload()
         {
             World.Dispose();
         }
+        #endregion
 
-        // -- Update Cycle ---
+        #region Timer
+        public void RegisterTimer(GameTimer timer)
+        {
+            if (!_timers.Contains(timer)) _timers.Add(timer);
+        }
+        public void RemoveTimer(GameTimer timer)
+        {
+            _timers.Remove(timer);
+        }
+        #endregion
 
+        #region Update
         public void Update(float _dt)
         {
             UpdateTimers(_dt);
@@ -88,23 +86,23 @@ namespace XEngine.Core.Scenery
             InvokeEvents();
             RemoveDeleted();
         }
-
         private void UpdateTimers(float _dt)
         {
             foreach (var timer in _timers) timer.Tick(_dt);
         }
-
         private void InvokeSystems(float _dt)
         {
             foreach (var _s in _systems) if (_s.IsEnabled) _s.Update(this, _dt);
         }
-
+        public void Schedule(Action action)
+        {
+            actions.Add(action);
+        }
         private void InvokeEvents()
         {
             foreach (var action in actions) action.Invoke();
             actions.Clear();
         }
-
         private void RemoveDeleted()
         {
             var _removedEntityId = _entities
@@ -114,19 +112,19 @@ namespace XEngine.Core.Scenery
             {
                 if (_entities.TryGetValue(key, out var value))
                 {
+                    value.Transform.SetParent(null);
                     value.Dispose();
                     _entities.Remove(key);
                 }
             }
         }
+        #endregion
 
-        // --- Queries ---
-
+        #region Query
         public IEnumerable<Entity> IterateByIds(IEnumerable<int> ids)
         {
             foreach (var id in ids) yield return _entities[id];
         }
-
         public IEnumerable<Entity> Query(Predicate<Entity> _predicate)
         {
             foreach (var _e in _entities.Values) if (_predicate(_e)) yield return _e;
@@ -170,5 +168,6 @@ namespace XEngine.Core.Scenery
                 }
             }
         }
+        #endregion
     }
 }

@@ -3,10 +3,12 @@
 		"Id": "baldy",
 		"Armor": 0,
 		"MaxHealth": 10,
-		"HealthRegenRate": 1,
+		"HealthRegenRate": 0.1,
+		"HealthRegenDelay": 3,
 		"Speed": 3,
 		"Acceleration": 35,
 		"JumpPower": 15,
+		"StartWeaponId": "pistol",
 		"TextureName": "Baldy"
 	}
 ]

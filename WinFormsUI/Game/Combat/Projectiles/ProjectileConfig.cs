@@ -13,9 +13,9 @@ namespace WinFormsUI.Game.Combat.Projectiles
 
         public float Damage { get; set; }
         public float Size { get; set; }
-        public float InitialVelocity { get; set; }
 
         public float MaxLifetime { get; set; }
+        public int Shots { get; set; }
 
         public string TexturePath { get; set; } = "";
         //public string TrailEffect { get; set; } = "";

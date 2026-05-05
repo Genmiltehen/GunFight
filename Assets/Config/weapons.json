@@ -1,0 +1,17 @@
+[
+	{
+		"Id": "pistol",
+		"ProjectileId": "pistol_bullet",
+		"InitialVelocity": 50,
+		"MaxAmmo": 12,
+		"FireRate": 1,
+		"Spread": 1,
+		"Shots": 5,
+		"MuzzleOffsetRatio": {
+			"X": 0.5,
+			"Y": 0.2
+		},
+		"TextureScale": 0.5,
+		"TexturePath": "Weapons\\Pistol.png"
+	}
+]

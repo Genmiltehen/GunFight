@@ -24,6 +24,7 @@ namespace XEngine.Core.Utils
             elapsed += deltaTime;
             if (elapsed >= Duration)
             {
+                elapsed = Duration;
                 IsRunning = false;
                 OnComplete?.Invoke();
             }
@@ -44,7 +45,7 @@ namespace XEngine.Core.Utils
         }
 
         public bool IsFinished => elapsed >= Duration;
-        public float Progress => Math.Clamp(elapsed / Duration, 0, 1);
+        public float Progress => elapsed / Duration;
 
         public event Action? OnComplete;
     }

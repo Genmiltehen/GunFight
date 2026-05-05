@@ -1,17 +1,22 @@
-﻿using XEngine.Core.Common;
+﻿using System.Diagnostics;
+using XEngine.Core.Common;
+using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Base
 {
-    public sealed class Entity : IDisposable
+    public sealed class Entity : System.IDisposable
     {
         public int Id { get; private set; }
         public GTransform Transform { get; private set; }
-        private readonly Dictionary<Type, GameComponent> _components = [];
-        internal bool _isDeleted = false;
+        public GScene Scene { get; private set; }
 
-        internal Entity(int id)
+        internal bool _isDeleted = false;
+        private readonly Dictionary<Type, GameComponent> _components = [];
+
+        internal Entity(int id, GScene scene)
         {
             Id = id;
+            Scene = scene;
             Transform = AddComponent<GTransform>();
         }
 
@@ -37,15 +42,26 @@ namespace XEngine.Core.Base
             return true;
         }
 
-        public void MarkDelete()
+        public void MarkDelete(bool RemoveChildren = false)
         {
             _isDeleted = true;
 
+            List<Entity> children = [];
             Entity? current = Transform.FirstChild?.Owner;
             while (current != null)
             {
-                current.MarkDelete();
+                children.Add(current);
                 current = current.Transform.NextSibling?.Owner;
+            }
+
+            foreach (var child in children)
+            {
+                if (RemoveChildren) child.MarkDelete(true);
+                else
+                {
+                    child.Transform.Position2D = child.Transform.RelativePosition2D;
+                    child.Transform.SetParent(null);
+                }
             }
         }
 

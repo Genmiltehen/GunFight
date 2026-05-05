@@ -1,9 +1,5 @@
-﻿using Box2D.NET;
-using XEngine.Core.Box2DCompat.Components;
-using XEngine.Core.Common.Sprite;
-using XEngine.Core.Scenery;
-using XEngine.Core.Utils.Maths;
-using static WinFormsUI.Game.Player.PlayerControlHelper;
+﻿using XEngine.Core.Scenery;
+using static WinFormsUI.Game.Player.Contol.ActionType;
 
 namespace WinFormsUI.Game.Player.PlayerStates
 {
@@ -11,13 +7,7 @@ namespace WinFormsUI.Game.Player.PlayerStates
     {
         public string DebugName => "Falling";
 
-        public void Enter(GPlayer player, GScene scene)
-        {
-            if (player.HeadEntity.TryGet<GSprite>(out var hSprite)) hSprite
-                    .SetTexture(scene.Assets.LoadTexture(player.HeadIdle), true);
-            if (player.BodyEntity.TryGet<GSprite>(out var bSprite)) bSprite
-                    .SetTexture(scene.Assets.LoadTexture(player.BodyJump), true);
-        }
+        public void Enter(GPlayer player, GScene scene) { player.Model.SetFall(); }
 
         public void Exit(GPlayer player, GScene scene)
         {
@@ -26,29 +16,23 @@ namespace WinFormsUI.Game.Player.PlayerStates
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            if (IsOnGround(player))
+            if (player.Movement.IsOnGround)
             {
                 if (player.JumpTimer.IsRunning) player.JumpTimer.Reset();
                 player.SwitchTo<IdleState>(scene);
                 return;
             }
 
-            var hor = HorizotnalInput(player, scene.Input);
-            var b2bodyId = player.Owner.Get<GBox2DBody>()!.Id;
-            var vel = B2Bodies.b2Body_GetLinearVelocity(b2bodyId);
-            var delta = MathUtils.MoveToward(vel.X, player.Stats.TopSpeed * hor, player.Stats.Acceleration * dt) - vel.X;
-            B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2bodyId, new(delta * 0.5f, 0), true);
-            if (hor != 0) PlayerHelper.SetFacing(player, new(hor, 0));
+            player.Movement.MovePlayer(player.Control.HorizotnalInput(), dt, 0.5f);
 
-            
-            var jump = JumpStart(player, scene.Input);
+            var jump = player.Control.Fetch("jump", ActionActive);
             if (!jump) player.JumpTimer.Reset();
 
             if (jump && player.JumpTimer.IsRunning)
-                B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2bodyId, new(0, player.Stats.JumpPower * dt), true);
+                player.Movement.ApplyImpulse(new(0, player.Stats.JumpPower * dt));
 
-            if (scene.Input.IsActionJustReleased($"jump{player.Name}"))
-                B2Bodies.b2Body_ApplyLinearImpulseToCenter(b2bodyId, new(0, -vel.Y * 0.5f), true);
+            if (player.Control.Fetch("jump", ActionEnd))
+                player.Movement.ApplyImpulse(new(0, -player.Movement.GetVelocity().Y * 0.5f));
         }
     }
 }
