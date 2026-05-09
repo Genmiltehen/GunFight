@@ -2,8 +2,8 @@
 	{
 		"Id": "pistol_bullet",
 		"Damage": 2,
-		"Size": 0.1,
-		"MaxLifetime": 1,
+		"Size": 1,
+		"MaxLifetime": 2,
 		"TexturePath": "Projectiles\\Bullet.png"
 	}
 ]

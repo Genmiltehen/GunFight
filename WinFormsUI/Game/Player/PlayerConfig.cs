@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WinFormsUI.Game.Config;
+﻿using WinFormsUI.Game.Config;
 
 namespace WinFormsUI.Game.Player
 {

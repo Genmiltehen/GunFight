@@ -30,14 +30,10 @@ namespace WinFormsUI
 
         private void MainFormLoad(object sender, EventArgs e)
         {
-            Debug.WriteLine("formload");
-            int width = ClientSize.Width;
-            int height = ClientSize.Height;
-
             _engine.Renderer.AddRenderModule(new TracerRenderModule(_engine.GLProvider));
-            _engine.Renderer.SetViewport(width, height);
+            _engine.Renderer.SetViewport(ClientSize.Width, ClientSize.Height);
 
-            _engine.SceneManager.SwitchTo(new Level1Scene(_engine));
+            _engine.SceneManager.SwitchTo(new MainScene(_engine));
 
             _stopwatch.Start();
             MainTimer.Start();
@@ -48,8 +44,7 @@ namespace WinFormsUI
 
         private void OnGLLoad(object sender, EventArgs e)
         {
-            Debug.WriteLine("glload");
-            GL.Enable(EnableCap.Blend | EnableCap.DepthTest);
+            GL.Enable(EnableCap.DepthTest);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.ClearColor(Color.Black);

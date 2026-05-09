@@ -11,55 +11,67 @@ namespace WinFormsUI.Game.Player.PlayerStates
         private const float UpperLimit = MathF.PI / 2 - Lim;
         private float _angle = 0;
 
+        private WeaponItem? currentWeapon = null!;
         public string DebugName => "Aiming";
 
         public void Enter(GPlayer player, GScene scene)
         {
-            if (player.Weaponry.HeldWeapon == null)
+            if (!player.Weaponry.TryTake(out currentWeapon))
             {
-                player.SwitchTo<IdleState>(scene);
+                player.SwitchTo<GroundedState>(scene);
                 return;
             }
 
+            player.Model.SetWeaponTexture(currentWeapon);
+            player.Model.UpdatePockets(player.Weaponry);
             player.Model.SetAiming();
-            player.Model.SetWeaponTexture(player.Weaponry.HeldWeapon);
         }
 
         public void Exit(GPlayer player, GScene scene)
         {
-            player.Model.SetFacingDiecration(new(player.IsRightFacing ? 1 : -1, 0));
+            player.Model.SetFacingDiecration(player.IsRightFacing ? 1 : -1);
             player.Model.SetWeaponTexture();
+            player.Weaponry.Equip(currentWeapon);
+            player.Model.UpdatePockets(player.Weaponry);
         }
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            if (player.Control.Fetch("aim", ActionInactive))
+            if (player.Control.Fetch("aux", ActionStart) && currentWeapon != null)
             {
-                player.SwitchTo<IdleState>(scene);
+                player.Drop(currentWeapon, canPickUp: true);
+                currentWeapon = null;
+            }
+
+            if (player.Control.Fetch("act", ActionActive) && currentWeapon != null)
+            {
+                if (currentWeapon.CurrentAmmo == 0)
+                {
+                    player.Drop(currentWeapon, expirationTime: 3);
+                    currentWeapon = null;
+                }
+                else player.Shoot(currentWeapon);
+            }
+
+            if (player.Control.Fetch("aim", ActionInactive) || currentWeapon == null)
+            {
+                player.SwitchTo<GroundedState>(scene);
                 return;
             }
 
-            if (player.Control.Fetch("act", ActionActive)) player.Weaponry.Shoot();
+            var hor = player.Control.HorizotnalInput();
+            var playerRight = player.IsRightFacing;
 
-            var left = player.Control.Fetch("left", ActionStart);
-            var right = player.Control.Fetch("right", ActionStart);
-
-            if (!(left || right))
+            if (hor == 0)
             {
                 _angle = Math.Clamp(_angle + player.Control.VerticalInput() * dt, LowerLimit, UpperLimit);
 
                 var (sin, cos) = MathF.SinCos(_angle);
-                player.Model.SetFacingDiecration(new((player.IsRightFacing ? 1 : -1) * cos, sin));
+                player.Model.SetFacingDiecration((playerRight ? 1 : -1) * cos, sin);
                 return;
             }
 
-            if ((player.IsRightFacing && right) || (!player.IsRightFacing && left))
-            {
-                player.SwitchTo<WalkState>(scene);
-                return;
-            }
-
-            player.IsRightFacing = player.Model.SetFacingDiecration(new(right ? 1 : -1, 0));
+            player.IsRightFacing = player.Model.SetFacingDiecration(hor > 0 ? 1 : -1);
             _angle = 0;
         }
     }

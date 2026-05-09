@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
-using XEngine.Core.Common;
+using XEngine.Core.Common.Transform;
 using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Box2DCompat.Systems

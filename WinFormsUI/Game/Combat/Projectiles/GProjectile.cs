@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XEngine.Core.Base;
-using XEngine.Core.Scenery;
-using XEngine.Core.Utils;
+﻿using XEngine.Core.Base;
 
 namespace WinFormsUI.Game.Combat.Projectiles
 {
@@ -17,12 +10,6 @@ namespace WinFormsUI.Game.Combat.Projectiles
         public GProjectile Init(ProjectileConfig config)
         {
             Damage = config.Damage;
-            return this;
-        }
-
-        public GProjectile SetSource(string sourceName)
-        {
-            Source = sourceName;
             return this;
         }
     }

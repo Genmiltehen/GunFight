@@ -21,7 +21,8 @@ namespace XEngine.Core.Scenery
         public readonly IInputService Input;
         public readonly IAssetLoader Assets;
         public readonly Random Random;
-        public float GetRandomFloat() => (float)Random.NextDouble();
+        public float GetR01() => (float)Random.NextDouble();
+        public float GetR_11() => (float)Random.NextDouble() * 2 - 1;
         public GCamera Camera { get; }
         public GBox2DWorld World { get; }
 
@@ -72,7 +73,7 @@ namespace XEngine.Core.Scenery
         {
             if (!_timers.Contains(timer)) _timers.Add(timer);
         }
-        public void RemoveTimer(GameTimer timer)
+        public void UnregisterTimer(GameTimer timer)
         {
             _timers.Remove(timer);
         }
@@ -121,6 +122,7 @@ namespace XEngine.Core.Scenery
         #endregion
 
         #region Query
+        public Entity? GetById(int id) => _entities.TryGetValue(id, out var entity) ? entity : null;
         public IEnumerable<Entity> IterateByIds(IEnumerable<int> ids)
         {
             foreach (var id in ids) yield return _entities[id];

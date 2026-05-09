@@ -19,9 +19,9 @@ namespace XEngine.Core.Common.Sprite.NineSlice
             return this;
         }
 
-        public GNineSlice SetBorders(float paddingX, float paddingR)
+        public GNineSlice SetBorders(float paddingX, float paddingY)
         {
-            Borders = new Vector4(paddingX, paddingX, paddingR, paddingR);
+            Borders = new Vector4(paddingX, paddingX, paddingY, paddingY);
             return this;
         }
 
@@ -31,9 +31,15 @@ namespace XEngine.Core.Common.Sprite.NineSlice
             return this;
         }
 
-        public new GNineSlice SetTexture(Texture2D texture, bool useTextureSize)
+        public new GNineSlice SetTexture(Texture2D texture)
         {
-            base.SetTexture(texture, useTextureSize);
+            base.SetTexture(texture);
+            return this;
+        }
+
+        public new GNineSlice SetSizingPolicy(SizingPolicy policy)
+        {
+            base.SetSizingPolicy(policy);
             return this;
         }
 
@@ -52,6 +58,12 @@ namespace XEngine.Core.Common.Sprite.NineSlice
         public new GNineSlice SetSize(Vector2 size)
         {
             base.SetSize(size);
+            return this;
+        }
+
+        public new GNineSlice SetAlpha(float alpha)
+        {
+            base.SetAlpha(alpha);
             return this;
         }
 

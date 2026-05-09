@@ -9,14 +9,6 @@ using System.Threading.Tasks;
 
 namespace XEngine.Core.Utils.JSONConverters
 {
-    public class JsonVector2 : JsonConverterAttribute
-    {
-        public override JsonConverter? CreateConverter(Type typeToConvert)
-        {
-            return new OTKVector2Converter();
-        }
-    }
-
     internal class OTKVector2Converter : JsonConverter<Vector2>
     {
         public override Vector2 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

@@ -13,7 +13,7 @@ namespace WinFormsUI.Game.Combat.Weapons
             configLoader = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Config", "weapons.json"));
         }
 
-        public bool CreateWeapon(string id, out WeaponItem item)
+        public bool TryCreateWeapon(string id, out WeaponItem item)
         {
             item = null!;
             bool res = configLoader.TryGetConfig(id, out var wConfig);

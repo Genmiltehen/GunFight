@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Box2D.NET;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +20,6 @@ namespace XEngine.Core.Utils.Maths
             var (s, c) = MathF.SinCos(theta);
             return rho * new Vector2(c, s);
         }
-
         public static Vector2 Rotate(Vector2 v, float angle)
         {
             var (s, c) = MathF.SinCos(angle);
@@ -29,54 +29,19 @@ namespace XEngine.Core.Utils.Maths
         public static Vector4 Homogenize(Vector3 v) => new(v.X, v.Y, v.X, 1);
         public static Vector3 Dehomogenize(Vector4 v) => v.Xyz / v.W;
 
-        public static float Cross2D(Vector2 a, Vector2 b)
+        public static Vector2 FromB2Vec2(B2Vec2 v) => new(v.X, v.Y);
+        public static B2Vec2 FromVector2(Vector2 v) => new(v.X, v.Y);
+
+        public static float LimitedStep(float from, float to, float step)
         {
-            return a.X * b.Y - a.Y * b.X;
+            float diff = to - from;
+            return Math.Abs(diff) <= step ? diff : Math.Sign(diff) * step;
         }
 
-        public static Vector2 LeftPerp(Vector2 v)
+        public static Vector2 LimitedStep(Vector2 from, Vector2 to, float step)
         {
-            return new Vector2(v.Y, -v.X);
-        }
-
-        public static Vector2 RightPerp(Vector2 v)
-        {
-            return new Vector2(-v.Y, v.X);
-        }
-
-        public static Vector2 PerpTowards(Vector2 v, Vector2 normal)
-        {
-            Vector2 res = new(v.Y, -v.X);
-            if (Vector2.Dot(res, normal) < 0) res = -res;
-            return res;
-        }
-
-        public static Vector2 FlipTowards(Vector2 v, Vector2 direction)
-        {
-            return Vector2.Dot(direction, v) >= 0 ? v : -v;
-        }
-
-        public static void CalcAxes(float rotation, out Vector2 axis1, out Vector2 axis2)
-        {
-            var (sin, cos) = MathF.SinCos(rotation);
-            axis1 = new Vector2(cos, sin);
-            axis2 = new Vector2(-sin, cos);
-        }
-
-        public static bool Box2Intersect(Box2 a, Box2 b)
-        {
-            return a.Min.X <= b.Max.X && a.Max.X >= b.Min.X &&
-                   a.Min.Y <= b.Max.Y && a.Max.Y >= b.Min.Y;
-        }
-
-        public static Vector2 LineProjection(Vector2 p, Segment line)
-        {
-            return line.start + Vector2.Dot(p - line.start, line.Direction) * line.Direction;
-        }
-
-        public static Vector2 LineProjectionClipped(Vector2 p, Segment seg)
-        {
-            return seg.ClampLerp(Vector2.Dot(p - seg.start, seg.Direction) / seg.Length);
+            Vector2 diff = to - from;
+            return diff.LengthSquared <= step * step ? diff : diff.Normalized() * step;
         }
 
         public static float MoveToward(float current, float target, float maxDelta)

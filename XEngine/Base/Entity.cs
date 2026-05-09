@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using XEngine.Core.Common;
+using XEngine.Core.Common.Transform;
 using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Base
@@ -7,10 +7,12 @@ namespace XEngine.Core.Base
     public sealed class Entity : System.IDisposable
     {
         public int Id { get; private set; }
+        public int SourceId { get; private set; } = -1;
         public GTransform Transform { get; private set; }
         public GScene Scene { get; private set; }
 
         internal bool _isDeleted = false;
+        private bool _isSourceSet = false;
         private readonly Dictionary<Type, GameComponent> _components = [];
 
         internal Entity(int id, GScene scene)
@@ -25,6 +27,13 @@ namespace XEngine.Core.Base
             T component = new() { Owner = this };
             _components[typeof(T)] = component;
             return component;
+        }
+
+        public void SetSource(int id)
+        {
+            if (_isSourceSet) return;
+            _isSourceSet = true;
+            SourceId = id;
         }
 
         public bool Has<T>() where T : GameComponent => _components.ContainsKey(typeof(T));

@@ -1,4 +1,5 @@
 ﻿using XEngine.Core.Scenery;
+using static WinFormsUI.Game.Box2D.ContactFlags;
 using static WinFormsUI.Game.Player.Contol.ActionType;
 
 namespace WinFormsUI.Game.Player.PlayerStates
@@ -7,32 +8,41 @@ namespace WinFormsUI.Game.Player.PlayerStates
     {
         public string DebugName => "Falling";
 
-        public void Enter(GPlayer player, GScene scene) { player.Model.SetFall(); }
+        public void Enter(GPlayer player, GScene scene) { player.Model.SetFalling(); }
 
-        public void Exit(GPlayer player, GScene scene)
-        {
-            // TODO: animation end
-        }
+        public void Exit(GPlayer player, GScene scene) { }
 
         public void ProcessInput(GPlayer player, GScene scene, float dt)
         {
-            if (player.Movement.IsOnGround)
+            if (player.Control.Fetch("up", ActionActive) && player.Contacts.Has(LADDER))
             {
-                if (player.JumpTimer.IsRunning) player.JumpTimer.Reset();
-                player.SwitchTo<IdleState>(scene);
+                player.SwitchTo<ClimbState>(scene);
                 return;
             }
 
-            player.Movement.MovePlayer(player.Control.HorizotnalInput(), dt, 0.5f);
+            if (player.Contacts.Has(SOLID))
+            {
+                player.JumpTimer.Reset();
+                player.SwitchTo<GroundedState>(scene);
+                return;
+            }
 
-            var jump = player.Control.Fetch("jump", ActionActive);
+            if (player.Control.Fetch("aux", ActionStart))
+            {
+                player.Weaponry.Swap();
+                player.Model.UpdatePockets(player.Weaponry);
+            }
+
+            float hor = player.Control.HorizotnalInput();
+            if (hor != 0) player.IsRightFacing = player.Model.SetFacingDiecration(hor);
+            player.Move(hor, dt, 0.5f);
+
+            var jump = player.Control.Fetch("up", ActionActive);
             if (!jump) player.JumpTimer.Reset();
+            if (jump && player.JumpTimer.IsRunning) player.Body.ApplyImpulse(0, player.Stats.JumpPower * dt);
 
-            if (jump && player.JumpTimer.IsRunning)
-                player.Movement.ApplyImpulse(new(0, player.Stats.JumpPower * dt));
-
-            if (player.Control.Fetch("jump", ActionEnd))
-                player.Movement.ApplyImpulse(new(0, -player.Movement.GetVelocity().Y * 0.5f));
+            if (player.Control.Fetch("up", ActionEnd))
+                player.Body.ApplyImpulse(0, -player.Body.LinearVelocity.Y * 0.5f);
         }
     }
 }

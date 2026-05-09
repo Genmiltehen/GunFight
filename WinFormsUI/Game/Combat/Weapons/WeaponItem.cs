@@ -39,14 +39,17 @@ namespace WinFormsUI.Game.Combat.Weapons
             CurrentAmmo = MaxAmmo;
         }
 
-        public WeaponItem InitTexture(IAssetLoader assets)
+        public WeaponItem Init(GScene scene)
         {
             if (_initialized) return this;
             _initialized = true;
 
-            SavedTexture = assets.LoadTexture(_config.TexturePath);
-            TexSize = SavedTexture.Size * _config.TextureScale;
-            MuzzleOffset = _config.MuzzleOffsetRatio * TexSize;
+            scene.RegisterTimer(FireTimer);
+            FireTimer.Start();
+
+            SavedTexture = scene.Assets.LoadTexture(_config.TexturePath);
+            TexSize = new Vector2(_config.TextureScale);
+            MuzzleOffset = _config.MuzzleOffsetRatio * _config.TextureScale * SavedTexture.Size / scene.World.PixelPerMetre;
             return this;
         }
     }

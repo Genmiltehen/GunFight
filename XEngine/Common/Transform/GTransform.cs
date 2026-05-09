@@ -4,7 +4,7 @@ using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Utils.Maths;
 
-namespace XEngine.Core.Common
+namespace XEngine.Core.Common.Transform
 {
     public sealed class GTransform : GameComponent, IDirtiable
     {
@@ -20,6 +20,7 @@ namespace XEngine.Core.Common
 
         public bool IsSynced { get; private set; } = true;
 
+        public GTransform Init(TransformValues values) => Init(values.Position, values.Rotation);
         public GTransform Init(Vector3 pos, float rotation)
         {
             _position = pos;
@@ -89,6 +90,7 @@ namespace XEngine.Core.Common
             set => Position = new Vector3(_position.X, _position.Y, value);
         }
 
+        public Vector3 RelativePosition => Parent != null ? (MathUtils.Homogenize(_position) * Parent.GetWorldMatrix()).Xyz : Position;
         public Vector2 RelativePosition2D => Parent != null ? (MathUtils.Homogenize(_position) * Parent.GetWorldMatrix()).Xy : Position2D;
 
         public Vector3 Position

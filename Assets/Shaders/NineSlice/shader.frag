@@ -5,9 +5,10 @@ in vec2 vTexCoord;
 out vec4 FragColor;
 
 uniform sampler2D uTexture;
-uniform vec2 uTexSize;      // Source texture dimensions (pixels)
-uniform vec4 uBorder;       // l, r, t, b borders (pixels)
-uniform vec2 uRenderSize;   // Rendered sprite dimensions (pixels)
+uniform vec2 uTexSize;
+uniform vec4 uBorder;
+uniform vec2 uRenderSize;
+uniform float uAlpha;
 
 
 void main()
@@ -56,6 +57,7 @@ void main()
     }
 
     vec4 texColor = texture(uTexture, uv);
+	texColor.a *= uAlpha;
     if (texColor.a < 0.1)
         discard;
     FragColor = texColor;

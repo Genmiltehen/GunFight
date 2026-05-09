@@ -53,7 +53,7 @@ namespace XEngine.Core
 
             SpriteRendererModule spriteRenderer = new(_glProvider);
             NineSliceRendererModule nineslicerenderer = new(_glProvider);
-            Box2DBodyRender debugRenderer = new(_glProvider) { IsEnabled = true };
+            Box2DBodyRender debugRenderer = new(_glProvider) { IsEnabled = _config.Debug };
             _renderPipeline.AddRenderModule(spriteRenderer);
             _renderPipeline.AddRenderModule(nineslicerenderer);
             _renderPipeline.AddRenderModule(debugRenderer);

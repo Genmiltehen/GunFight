@@ -78,7 +78,7 @@ namespace XEngine.Core.DebugUtils.Render
 
             using (lb.TraceLine(closed: true))
             {
-                for (int i = 0; i <= PolyRes; i++) lb.AddPoint(b2Add(points[i], curr), color);
+                for (int i = 0; i <= PolyRes; i++) lb.AddPoint(points[i] + curr, color);
 
                 for (int i = 1; i < poly.count; i++)
                 {
@@ -87,7 +87,7 @@ namespace XEngine.Core.DebugUtils.Render
                     next = b2TransformPoint(tr, poly.vertices[(i + 1) % poly.count]);
                     GetAngles(prev, curr, next, out start, out end);
                     CalcArc(ref points, poly.radius, start, end);
-                    for (int j = 0; j <= PolyRes; j++) lb.AddPoint(b2Add(points[j], curr), color);
+                    for (int j = 0; j <= PolyRes; j++) lb.AddPoint(points[j] + curr, color);
                 }
             }
         }
@@ -114,10 +114,10 @@ namespace XEngine.Core.DebugUtils.Render
             using (lb.TraceLine(closed: true))
             {
                 CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
-                for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], c1), color);
+                for (int i = 0; i <= CapRes; i++) lb.AddPoint(points[i] + c1, color);
                 capAng += MathF.PI;
                 CalcArc(ref points, capsule.radius, capAng, capAng + MathF.PI);
-                for (int i = 0; i <= CapRes; i++) lb.AddPoint(b2Add(points[i], c2), color);
+                for (int i = 0; i <= CapRes; i++) lb.AddPoint(points[i] + c2, color);
             }
         }
 
@@ -129,7 +129,7 @@ namespace XEngine.Core.DebugUtils.Render
             CalcArc(ref points, circle.radius, 0, MathF.Tau);
             using (lb.TraceLine(closed: true))
             {
-                for (int i = 0; i <= CircRes; i++) lb.AddPoint(b2Add(points[i], c0), color);
+                for (int i = 0; i <= CircRes; i++) lb.AddPoint(points[i] + c0, color);
             }
         }
     }

@@ -1,23 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XEngine.Core.Base;
+﻿using XEngine.Core.Base;
 using XEngine.Core.Utils;
 
 namespace XEngine.Core.Common.LifeTime
 {
-    public class GLifeTime : GameComponent
+    public sealed class GLifeTime : GameComponent, IDisposable
     {
         public readonly GameTimer LifeTimer = new(float.MaxValue);
-
+        public bool IsBlinking = false;
+    
         public GLifeTime Init(float lifeTime)
         {
             LifeTimer.Duration = lifeTime;
             Owner.Scene.RegisterTimer(LifeTimer);
             LifeTimer.Start();
+            LifeTimer.OnComplete += () => Owner.MarkDelete();
             return this;
+        }
+
+        public void Dispose()
+        {
+            Owner.Scene.UnregisterTimer(LifeTimer);
         }
     }
 }

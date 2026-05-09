@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using XEngine.Core.Common.Transform;
 using XEngine.Core.Graphics;
 using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;
@@ -28,6 +29,7 @@ namespace XEngine.Core.Common.Sprite
             _spriteShader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
             _spriteShader.SetInt("uTexture", 0);
             GL.ActiveTexture(TextureUnit.Texture0);
+            float ppm = scene.World.PixelPerMetre;
 
             _provider.UnitQuad.Bind();
             foreach (var (_, tr, sprite) in scene.Query<GTransform, GSprite>())
@@ -36,11 +38,10 @@ namespace XEngine.Core.Common.Sprite
 
                 sprite.UseTexture();
 
-                var ts = sprite.TextureSize;
-                var texSize = sprite.IsUseTextureSize ? Matrix4.CreateScale(ts.X, ts.Y, 1) : Matrix4.Identity;
                 var flips = Matrix4.CreateScale(sprite.FlipX ? -1 : 1, sprite.FlipY ? -1 : 1, 1);
-                var modelMatrix = scene.World.PPMScale * flips * texSize * sprite.GetModelMatrix() * tr.GetWorldMatrix();
+                var modelMatrix = scene.World.PPMScale * flips * sprite.GetSize(ppm) * sprite.GetModelMatrix() * tr.GetWorldMatrix();
                 _spriteShader.SetMatrix4("uModel", modelMatrix);
+                _spriteShader.SetFloat("uAlpha", sprite.Alpha);
 
                 _provider.UnitQuad.Draw();
             }

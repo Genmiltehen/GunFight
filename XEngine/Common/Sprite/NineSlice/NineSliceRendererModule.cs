@@ -1,6 +1,8 @@
 ﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System.Diagnostics;
 using System.Security.Policy;
+using XEngine.Core.Common.Transform;
 using XEngine.Core.Graphics;
 using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;
@@ -30,17 +32,20 @@ namespace XEngine.Core.Common.Sprite.NineSlice
 
             _nineShader.SetInt("uTexture", 0);
             GL.ActiveTexture(TextureUnit.Texture0);
+            float ppm = scene.World.PixelPerMetre;
+            //float ppm = 1;
 
             _provider.UnitQuad.Bind();
             foreach (var (_, tr, nineslice) in scene.Query<GTransform, GNineSlice>())
             {
                 _nineShader.SetVector2("uTexSize", nineslice.TextureSize);
                 _nineShader.SetVector4("uBorder", nineslice.Borders);
-                _nineShader.SetVector2("uRenderSize", nineslice.RenderSize);
+                _nineShader.SetVector2("uRenderSize", nineslice.RenderSize * ppm);
                 nineslice.UseTexture();
 
-                var modelMatrix = scene.World.PPMScale * nineslice.GetModelMatrix() * tr.GetWorldMatrix();
+                var modelMatrix = scene.World.PPMScale * nineslice.GetSize(ppm) * nineslice.GetModelMatrix() * tr.GetWorldMatrix();
                 _nineShader.SetMatrix4("uModel", modelMatrix);
+                _nineShader.SetFloat("uAlpha", nineslice.Alpha);
 
                 _provider.UnitQuad.Draw();
             }

@@ -1,8 +1,13 @@
 ﻿using OpenTK.Mathematics;
+using System.Diagnostics;
 using WinFormsUI.Game.Combat.Projectiles;
 using WinFormsUI.Game.Combat.Weapons;
 using WinFormsUI.Game.Config;
+using WinFormsUI.Game.Drop;
 using WinFormsUI.Game.Player;
+using WinFormsUI.Game.Player.Stats;
+using WinFormsUI.Game.Player.Stats.Effects;
+using WinFormsUI.Game.Scenes.PlayerSpawner;
 using XEngine.Core;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Systems;
@@ -15,16 +20,21 @@ using XEngine.Core.Scenery;
 
 namespace WinFormsUI.Game.Scenes
 {
-    internal class Level1Scene(GameEngine _engine) : GScene(_engine)
+    internal class MainScene(GameEngine _engine) : GScene(_engine)
     {
         private void SetupSystems()
         {
             AddSystem(new Box2DContactSystem()); // 50
             AddSystem(new CameraSystem(10)); // 100
             AddSystem(new PlayersSystem(Input)); // 100
-            AddSystem(new LifeTimerSystem()); // 200
-            AddSystem(new TraceSystem()); // 200
-            AddSystem(new HealthSystem()); // 200
+
+            // 200
+            AddSystem(new LifeTimerSystem());
+            AddSystem(new TraceSystem());
+            AddSystem(new HealthSystem());
+            AddSystem(new EffectsSystem());
+            AddSystem(new ProjectileSystem());
+
             AddSystem(new Box2DTransformSync(12)); // 400
         }
 
@@ -39,28 +49,31 @@ namespace WinFormsUI.Game.Scenes
                 string path = Path.Combine(folder, $"{i}.png");
                 tex = Assets.LoadTexture(path);
                 e = SpawnEntity();
+
                 e.Transform.Init(new(0, 0, -10 * j), 0);
+
                 e.AddComponent<GSprite>()
-                    .SetTexture(tex, true)
+                    .SetTexture(tex)
+                    .SetSizingPolicy(SizingPolicy.Source)
                     .SetSize(Vector2.One * j);
             }
         }
 
         public override void Load()
         {
+            AddSystem(new PlayerSpawnSystem("baldy", "baldy"));
+
             SetupSystems();
             CreateBG("Environment\\Background");
-
-            LevelElementsFabctory.CreatePlatform(this, new(0, -4, 0), new(20, 8), 0);
-            LevelElementsFabctory.CreatePlatform(this, new(-10, -1, 0), new(6, 14), 0);
-
-            LevelElementsFabctory.CreateBox(this, new(-3, 2, 0), new(2, 2), 0);
-            LevelElementsFabctory.CreateBox(this, new(-3, 3, 0), new(1, 1), 0);
-
             Camera.Owner.Transform.Position2D = new(0, 8);
 
-            PlayerFactory.Instance.CreatePlayer(this, new(-10, 6), "A", "baldy");
-            PlayerFactory.Instance.CreatePlayer(this, new(1, 0), "B", "baldy");
+            foreach (var bloc in LevelLoader.Load("Levels/Level1.json")) bloc.Spawn(this);
+
+            if (WeaponFactory.Instance.TryCreateWeapon("pistol", out var w))
+            {
+                w.Init(this);
+                DropBuilder.Init(w).SetVelocity(new(0, 10), 2).Spawn(this, new Vector3(0, 5, 0));
+            }
         }
     }
 }

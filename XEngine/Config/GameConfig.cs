@@ -6,8 +6,8 @@ namespace XEngine.Core.Config
 {
     public class GameConfig
     {
-        [JsonPropertyName("other")]
-        public List<string> OtherData { get; set; } = [];
+        [JsonPropertyName("debug")]
+        public bool Debug { get; set; } = true;
 
         [JsonPropertyName("keymap")]
         public Dictionary<string, Keys> KeyMap { get; set; } = [];

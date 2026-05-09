@@ -4,7 +4,7 @@ using XEngine.Core.Utils;
 
 namespace XEngine.Core.Common.Health
 {
-    public class GHealth : GameComponent
+    public sealed class GHealth : GameComponent, IDisposable
     {
         private readonly GameTimer RegenDelay = new(float.MaxValue);
         public float MaxHealth { get; private set; } = 0;
@@ -50,6 +50,11 @@ namespace XEngine.Core.Common.Health
                 Health = 0;
                 _onDeath?.Invoke(Owner);
             }
+        }
+
+        public void Dispose()
+        {
+            Owner.Scene.UnregisterTimer(RegenDelay);
         }
     }
 }

@@ -5,22 +5,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Base;
+using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Player.Stats
 {
-    public abstract class PlayerEffect : IPlayerStats
+    public abstract class Effect : IPlayerStats
     {
         protected IPlayerStats? _stats;
+        public readonly GameTimer Timer = new(float.MaxValue);
 
         public virtual float TopSpeed => _stats?.TopSpeed ?? 0f;
         public virtual float Acceleration => _stats?.Acceleration ?? 0f;
         public virtual float JumpPower => _stats?.JumpPower ?? 0f;
         public virtual float Armor => _stats?.Armor ?? 0f;
 
-        protected PlayerEffect() { }
-        public PlayerEffect SetBase(IPlayerStats stats)
+        public Effect SetBase(IPlayerStats stats)
         {
             _stats = stats;
+            return this;
+        }
+
+        public Effect Duration(float duration)
+        {
+            Timer.Duration = duration;
             return this;
         }
     }

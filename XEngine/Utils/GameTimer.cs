@@ -9,43 +9,47 @@ namespace XEngine.Core.Utils
     public class GameTimer
     {
         public bool IsRunning { get; internal set; }
+        public float Elapsed { get; internal set; }
+        public bool IsLooped;
         public float Duration;
-        private float elapsed;
 
-        public GameTimer(float duration)
+        public GameTimer(float duration, bool isLooped = false)
         {
-            this.Duration = duration;
+            Duration = duration;
+            IsLooped = isLooped;
             Reset();
         }
 
         internal void Tick(float deltaTime)
         {
             if (!IsRunning) return;
-            elapsed += deltaTime;
-            if (elapsed >= Duration)
+            Elapsed += deltaTime;
+            if (Elapsed >= Duration)
             {
-                elapsed = Duration;
+                Elapsed = Duration;
                 IsRunning = false;
                 OnComplete?.Invoke();
+                if (IsLooped) Start();
             }
         }
 
         public GameTimer Start()
         {
-            elapsed = 0;
+            Elapsed = 0;
             IsRunning = true;
             return this;
         }
 
         public GameTimer Reset()
         {
-            elapsed = 0;
+            Elapsed = 0;
             IsRunning = false;
             return this;
         }
 
-        public bool IsFinished => elapsed >= Duration;
-        public float Progress => elapsed / Duration;
+        public float Left => Duration - Elapsed;
+        public bool IsFinished => Elapsed >= Duration;
+        public float Progress => Elapsed / Duration;
 
         public event Action? OnComplete;
     }
