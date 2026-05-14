@@ -34,9 +34,8 @@ namespace WinFormsUI.Game.Config
             return _database.TryGetValue(Id, out res!);
         }
 
-        public IEnumerable<T> GetAllConfigs()
-        {
-            return _database.Values;
-        }
+        public IEnumerable<string> GetAllIds() => _database.Keys;
+
+        public IEnumerable<T> GetAllConfigs() => _database.Values;
     }
 }

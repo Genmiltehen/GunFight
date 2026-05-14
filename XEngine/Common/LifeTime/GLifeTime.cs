@@ -1,5 +1,4 @@
 ﻿using XEngine.Core.Base;
-using XEngine.Core.Utils;
 
 namespace XEngine.Core.Common.LifeTime
 {

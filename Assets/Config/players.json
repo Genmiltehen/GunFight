@@ -1,14 +1,26 @@
 [
 	{
-		"Id": "baldy",
-		"Armor": 0,
-		"MaxHealth": 10,
-		"HealthRegenRate": 0.1,
+		"Id": "green",
+		"Armor": 1,
+		"MaxHealth": 100,
+		"HealthRegenRate": 1,
 		"HealthRegenDelay": 3,
 		"Speed": 3,
 		"Acceleration": 35,
 		"JumpPower": 15,
-		"StartWeaponId": "pistol",
-		"TextureName": "Baldy"
+		"StartWeaponId": "H416",
+		"TextureName": "Green"
+	},
+	{
+		"Id": "red",
+		"Armor": 0,
+		"MaxHealth": 150,
+		"HealthRegenRate": 2,
+		"HealthRegenDelay": 0.1,
+		"Speed": 5,
+		"Acceleration": 40,
+		"JumpPower": 20,
+		"StartWeaponId": "ShotGun",
+		"TextureName": "Red"
 	}
 ]

@@ -44,12 +44,12 @@ namespace XEngine.Core.Utils.Maths
             return diff.LengthSquared <= step * step ? diff : diff.Normalized() * step;
         }
 
-        public static float MoveToward(float current, float target, float maxDelta)
+        public static float MoveToward(float from, float to, float step)
         {
-            if (Math.Abs(target - current) <= maxDelta)
-                return target;
+            if (Math.Abs(to - from) <= step)
+                return to;
 
-            return current + Math.Sign(target - current) * maxDelta;
+            return from + Math.Sign(to - from) * step;
         }
     }
 }

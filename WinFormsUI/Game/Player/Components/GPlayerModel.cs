@@ -2,9 +2,9 @@
 using OpenTK.Mathematics;
 using WinFormsUI.Game.Combat.Weapons;
 using XEngine.Core.Base;
+using XEngine.Core.Common;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Graphics.OpenGL;
-using XEngine.Core.Utils;
 using XEngine.Core.Utils.Maths;
 
 namespace WinFormsUI.Game.Player.Components

@@ -1,12 +1,7 @@
 ﻿using OpenTK.Mathematics;
-using System.Diagnostics;
 using WinFormsUI.Game.Combat.Projectiles;
-using WinFormsUI.Game.Combat.Weapons;
-using WinFormsUI.Game.Config;
-using WinFormsUI.Game.Drop;
 using WinFormsUI.Game.Player;
 using WinFormsUI.Game.Player.Stats;
-using WinFormsUI.Game.Player.Stats.Effects;
 using WinFormsUI.Game.Scenes.PlayerSpawner;
 using XEngine.Core;
 using XEngine.Core.Base;
@@ -20,8 +15,10 @@ using XEngine.Core.Scenery;
 
 namespace WinFormsUI.Game.Scenes
 {
-    internal class MainScene(GameEngine _engine) : GScene(_engine)
+    internal class MainScene(GameEngine _engine, string AId, string BId, string ArenaPath) : GScene(_engine)
     {
+        public string WinnerName = "";
+
         private void SetupSystems()
         {
             AddSystem(new Box2DContactSystem()); // 50
@@ -36,6 +33,8 @@ namespace WinFormsUI.Game.Scenes
             AddSystem(new ProjectileSystem());
 
             AddSystem(new Box2DTransformSync(12)); // 400
+
+            AddSystem(new WinSystem()); // 700
         }
 
         private void CreateBG(string folder)
@@ -61,19 +60,19 @@ namespace WinFormsUI.Game.Scenes
 
         public override void Load()
         {
-            AddSystem(new PlayerSpawnSystem("baldy", "baldy"));
+            AddSystem(new PlayerSpawnSystem(AId, BId));
 
             SetupSystems();
             CreateBG("Environment\\Background");
             Camera.Owner.Transform.Position2D = new(0, 8);
 
-            foreach (var bloc in LevelLoader.Load("Levels/Level1.json")) bloc.Spawn(this);
+            foreach (var bloc in LevelLoader.Load(ArenaPath)) bloc.Spawn(this);
+        }
 
-            if (WeaponFactory.Instance.TryCreateWeapon("pistol", out var w))
-            {
-                w.Init(this);
-                DropBuilder.Init(w).SetVelocity(new(0, 10), 2).Spawn(this, new Vector3(0, 5, 0));
-            }
+        public override void Unload()
+        {
+            ClearScene();
+            base.Unload();
         }
     }
 }

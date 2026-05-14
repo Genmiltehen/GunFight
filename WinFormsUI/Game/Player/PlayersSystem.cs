@@ -1,9 +1,5 @@
-﻿using Box2D.NET;
-using System.Diagnostics;
-using XEngine.Core.Box2DCompat.Components;
-using XEngine.Core.Input;
+﻿using XEngine.Core.Input;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Player
 {
@@ -14,6 +10,7 @@ namespace WinFormsUI.Game.Player
             foreach (var (_, player) in _scene.Query<GPlayer>())
             {
                 player.ProcessInput(_scene, _dt);
+                if (player.Owner.Transform.Position.Y < -15) player.Owner.MarkDelete();
             }
         }
     }

@@ -24,11 +24,13 @@ namespace WinFormsUI.Game.Scenes
                     IgnoreUnrecognizedTypeDiscriminators = true,
                     UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
                     DerivedTypes = {
+                        new JsonDerivedType(typeof(TowerLOC), "tower"),
                         new JsonDerivedType(typeof(PlatformLOC), "platform"),
-                        new JsonDerivedType(typeof(BoxLOC), "box"),
-                        new JsonDerivedType(typeof(EffectSpawnerLOC), "effect"),
                         new JsonDerivedType(typeof(PlayerLOC), "player"),
                         new JsonDerivedType(typeof(LadderLOC), "ladder"),
+                        new JsonDerivedType(typeof(EffectSpawnerLOC), "effectSpawner"),
+                        new JsonDerivedType(typeof(WeaponSpawnerLOC), "weaponSpawner"),
+                        new JsonDerivedType(typeof(BoxLOC), "box"),
                     }
                 };
             }

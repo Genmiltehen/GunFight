@@ -7,27 +7,20 @@ using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Common.Sprite
 {
-    public class SpriteRendererModule : RenderModule
+    public class SpriteRendererModule(GLProvider provider) : RenderModule(provider)
     {
         public override int Priority => 500;
-        private readonly GLProvider _provider;
-        private readonly Shader _spriteShader;
-
-        public SpriteRendererModule(GLProvider provider)
-        {
-            _provider = provider;
-            _spriteShader = _provider.GetShader("Sprite");
-        }
 
         public override void Render(GScene scene)
         {
             if (_screenSize.X <= 0 || _screenSize.Y <= 0) return;
+            var _shader = _provider.GetShader("Sprite");
 
-            _spriteShader.Use();
+            _shader.Use();
 
-            _spriteShader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
-            _spriteShader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
-            _spriteShader.SetInt("uTexture", 0);
+            _shader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
+            _shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
+            _shader.SetInt("uTexture", 0);
             GL.ActiveTexture(TextureUnit.Texture0);
             float ppm = scene.World.PixelPerMetre;
 
@@ -40,8 +33,8 @@ namespace XEngine.Core.Common.Sprite
 
                 var flips = Matrix4.CreateScale(sprite.FlipX ? -1 : 1, sprite.FlipY ? -1 : 1, 1);
                 var modelMatrix = scene.World.PPMScale * flips * sprite.GetSize(ppm) * sprite.GetModelMatrix() * tr.GetWorldMatrix();
-                _spriteShader.SetMatrix4("uModel", modelMatrix);
-                _spriteShader.SetFloat("uAlpha", sprite.Alpha);
+                _shader.SetMatrix4("uModel", modelMatrix);
+                _shader.SetFloat("uAlpha", sprite.Alpha);
 
                 _provider.UnitQuad.Draw();
             }

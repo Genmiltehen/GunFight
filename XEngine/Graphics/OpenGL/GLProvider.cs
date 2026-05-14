@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace XEngine.Core.Graphics.OpenGL
 {
@@ -41,17 +42,9 @@ namespace XEngine.Core.Graphics.OpenGL
         /// <returns></returns>
         public Shader LoadShader(string path, string name)
         {
+            if (_shaders.TryGetValue(name, out Shader? value)) return value;
             string _shader_path = Path.Combine(ShaderFolder, path);
-            var res = Shader.FromFolder(_shader_path);
-            SetShader(name, res);
-            return res;
-        }
-
-        private bool SetShader(string name, Shader shader)
-        {
-            if (_shaders.ContainsKey(name)) return false;
-            _shaders[name] = shader;
-            return true;
+            return _shaders[name] = Shader.FromFolder(_shader_path);
         }
 
         private void InitErrorShader()

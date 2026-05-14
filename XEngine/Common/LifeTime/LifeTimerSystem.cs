@@ -3,7 +3,6 @@ using System.Diagnostics;
 using XEngine.Core.Base;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils;
 
 namespace XEngine.Core.Common.LifeTime
 {

@@ -7,9 +7,9 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Base;
+using XEngine.Core.Common;
 using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Combat.Weapons
 {

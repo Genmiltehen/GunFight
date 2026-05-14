@@ -15,23 +15,23 @@ namespace WinFormsUI.Game.Scenes
 {
     internal static class LevelElementsFabctory
     {
-        private readonly static ContactFlags GroundMask = ContactFlags.FOOT | ContactFlags.PLAYER | ContactFlags.SOLID | ContactFlags.PROJECTILE | ContactFlags.ITEM;
+        private readonly static ContactFlags SolidMask = ContactFlags.FOOT | ContactFlags.PLAYER | ContactFlags.SOLID | ContactFlags.PROJECTILE | ContactFlags.ITEM;
 
-        public static Entity CreatePlatform(GScene scene, Vector3 pos, Vector2 size, float rotation = 0)
+        public static Entity CreateTower(GScene scene, Vector3 pos, Vector2 size, float rotation = 0)
         {
-            var _groundTex = scene.Assets.LoadTexture("Environment\\GroundOrange.png");
+            var _towerTex = scene.Assets.LoadTexture("Environment\\GroundOrange.png");
 
-            var ground = scene.SpawnEntity();
-            ground.Transform.Init(pos, rotation);
-            ground.AddComponent<GNineSlice>()
-                .SetTexture(_groundTex)
+            var tower = scene.SpawnEntity();
+            tower.Transform.Init(pos, rotation);
+            tower.AddComponent<GNineSlice>()
+                .SetTexture(_towerTex)
                 .SetSizingPolicy(World)
                 .SetSize(size)
                 .SetBorders(16)
                 .SetTranslation(new(0, 0.1f));
 
-            ground.AddComponent<GBox2DBody>()
-                .Init(ground.Transform)
+            tower.AddComponent<GBox2DBody>()
+                .Init(tower.Transform)
                 .SetType(B2BodyType.b2_staticBody)
                 .Build(scene.World.Id)
                 .AttacShapes(bid =>
@@ -41,10 +41,39 @@ namespace WinFormsUI.Game.Scenes
                     groundDef.material.friction = 1f;
                     groundDef.enableSensorEvents = true;
                     groundDef.filter.categoryBits = (ulong)ContactFlags.SOLID;
-                    groundDef.filter.maskBits = (ulong)GroundMask;
+                    groundDef.filter.maskBits = (ulong)SolidMask;
                     B2Shapes.b2CreatePolygonShape(bid, groundDef, groundBox);
                 });
-            return ground;
+            return tower;
+        }
+
+        public static Entity CreatePlatform(GScene scene, Vector3 pos, Vector2 size, float rotation = 0)
+        {
+            var _platformTex = scene.Assets.LoadTexture("Environment\\Box.png");
+
+            var platform = scene.SpawnEntity();
+            platform.Transform.Init(pos, rotation);
+            platform.AddComponent<GNineSlice>()
+                .SetTexture(_platformTex)
+                .SetSizingPolicy(World)
+                .SetSize(size)
+                .SetBorders(8);
+
+            platform.AddComponent<GBox2DBody>()
+                .Init(platform.Transform)
+                .SetType(B2BodyType.b2_staticBody)
+                .Build(scene.World.Id)
+                .AttacShapes(bid =>
+                {
+                    B2Polygon platformBox = B2Geometries.b2MakeBox(size.X / 2, size.Y / 2);
+                    B2ShapeDef platformDef = B2Types.b2DefaultShapeDef();
+                    platformDef.material.friction = 1f;
+                    platformDef.enableSensorEvents = true;
+                    platformDef.filter.categoryBits = (ulong)ContactFlags.SOLID;
+                    platformDef.filter.maskBits = (ulong)SolidMask;
+                    B2Shapes.b2CreatePolygonShape(bid, platformDef, platformBox);
+                });
+            return platform;
         }
 
         public static Entity CreateBox(GScene scene, Vector3 pos, Vector2 size, float rotation = 0)
@@ -70,7 +99,7 @@ namespace WinFormsUI.Game.Scenes
                     boxDef.material.friction = 1;
                     boxDef.enableSensorEvents = true;
                     boxDef.filter.categoryBits = (ulong)ContactFlags.SOLID;
-                    boxDef.filter.maskBits = (ulong)GroundMask;
+                    boxDef.filter.maskBits = (ulong)SolidMask;
                     B2Shapes.b2CreatePolygonShape(bid, boxDef, boxBox);
                 });
             return box;
@@ -103,6 +132,22 @@ namespace WinFormsUI.Game.Scenes
                 });
 
             return ladder;
+        }
+
+        public static Entity CreateWeaponSpawner(GScene scene, Vector3 pos)
+        {
+            var e = scene.SpawnEntity();
+            e.Transform.Init(pos, 0);
+            e.AddComponent<GWeaponSpawner>().Init();
+            return e;
+        }
+
+        public static Entity CreateEffectSpawner(GScene scene, Vector3 pos)
+        {
+            var e = scene.SpawnEntity();
+            e.Transform.Init(pos, 0);
+            e.AddComponent<GEffectSpawner>().Init();
+            return e;
         }
 
         public static Entity CreateEffect(GScene scene, Vector3 pos, float ColliderSize, Effect effect)

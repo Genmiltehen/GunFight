@@ -3,11 +3,11 @@ using XEngine.Core.Scenery;
 
 namespace WinFormsUI.Game.Scenes.LOCs
 {
-    internal class EffectSpawnerLOC : BaseLOC
+    internal class WeaponSpawnerLOC : BaseLOC
     {
         public override Entity Spawn(GScene scene)
         {
-            return LevelElementsFabctory.CreateEffectSpawner(scene, Pos);
+            return LevelElementsFabctory.CreateWeaponSpawner(scene, Pos);
         }
     }
 }

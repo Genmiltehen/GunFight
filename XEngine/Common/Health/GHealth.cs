@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using XEngine.Core.Base;
-using XEngine.Core.Utils;
+using XEngine.Core.Utils.Maths;
 
 namespace XEngine.Core.Common.Health
 {
@@ -10,15 +10,20 @@ namespace XEngine.Core.Common.Health
         public float MaxHealth { get; private set; } = 0;
         public float HealthRegen { get; private set; } = 0;
         public float Health { get; private set; } = 0;
+        public bool IsRendered = false;
 
-        public float Ratio => Health / MaxHealth;
+        private float _dHealth = 0;
+        private const float DHFR = 10f; // Display health fill rate
+
+        public float DisplayRatio => _dHealth / MaxHealth;
+        public float DisplayLeftRatio => 1 - _dHealth / MaxHealth;
         public bool CanRegenerate => RegenDelay.IsFinished;
 
         private Action<Entity>? _onDeath = null;
 
-        public GHealth Init(float MaxHealth)
+        public GHealth Init(float maxHealth)
         {
-            Health = this.MaxHealth = MaxHealth;
+            _dHealth = Health = MaxHealth = maxHealth;
             Owner.Scene.RegisterTimer(RegenDelay);
             return this;
         }
@@ -38,14 +43,15 @@ namespace XEngine.Core.Common.Health
 
         public void Update(float dt)
         {
-            if (CanRegenerate) Health = Math.Clamp(Health + HealthRegen * dt, 0, MaxHealth);
+            if (CanRegenerate) Health = MathUtils.MoveToward(Health, MaxHealth, HealthRegen * dt);
+            _dHealth = float.Lerp(_dHealth, Health, dt * DHFR);
         }
 
         public void DealDamage(float amount)
         {
             RegenDelay.Start();
             Health -= amount;
-            if (Health < 0)
+            if (Health <= 0)
             {
                 Health = 0;
                 _onDeath?.Invoke(Owner);

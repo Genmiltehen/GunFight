@@ -5,19 +5,21 @@ using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;
 using XEngine.Core.Graphics;
 using XEngine.Core.Input;
-using XEngine.Core.Utils;
 
 namespace XEngine.Core.Scenery
 {
     public class GScene
     {
+        public event Action? OnEnd;
+
         protected int _id = 0;
 
         private readonly Dictionary<int, Entity> _entities = [];
         private readonly List<IGameSystem> _systems = [];
-        private readonly List<Action> actions = [];
+        private readonly List<Action> schedules = [];
         private readonly List<GameTimer> _timers = [];
 
+        public bool IsDeleted { get; set; } = false;
         public readonly IInputService Input;
         public readonly IAssetLoader Assets;
         public readonly Random Random;
@@ -48,6 +50,18 @@ namespace XEngine.Core.Scenery
             return _e;
         }
 
+        public void Schedule(Action action)
+        {
+            schedules.Add(action);
+        }
+
+        protected void ClearScene()
+        {
+            foreach (var e in _entities.Values) e.MarkDelete();
+        }
+
+        public void End() => OnEnd?.Invoke();
+
         #region System
         public void AddSystem(IGameSystem system)
         {
@@ -62,7 +76,7 @@ namespace XEngine.Core.Scenery
 
         #region Context
         public virtual void Load() { }
-        public void Unload()
+        public virtual void Unload()
         {
             World.Dispose();
         }
@@ -82,6 +96,7 @@ namespace XEngine.Core.Scenery
         #region Update
         public void Update(float _dt)
         {
+            if (IsDeleted) return;
             UpdateTimers(_dt);
             InvokeSystems(_dt);
             InvokeEvents();
@@ -95,14 +110,10 @@ namespace XEngine.Core.Scenery
         {
             foreach (var _s in _systems) if (_s.IsEnabled) _s.Update(this, _dt);
         }
-        public void Schedule(Action action)
-        {
-            actions.Add(action);
-        }
         private void InvokeEvents()
         {
-            foreach (var action in actions) action.Invoke();
-            actions.Clear();
+            foreach (var action in schedules) action.Invoke();
+            schedules.Clear();
         }
         private void RemoveDeleted()
         {

@@ -48,7 +48,6 @@ namespace WinFormsUI.Game.Combat.Projectiles
                 .SetBulletFlag(true)
                 .Build(scene.World.Id)
                 .EnableCollisionCallback()
-                .AttacShapes(CreatwWeight)
                 .AttacShapes(CreateCollider(projConfig));
 
             bodyComp.GravityScale = 0.1f;
@@ -81,6 +80,7 @@ namespace WinFormsUI.Game.Combat.Projectiles
             };
         }
 
+        private const float MIN_DAMAGE = 0.1f;
         private static void BulletCollisionCallback(ContactWrapper ev)
         {
 
@@ -92,7 +92,7 @@ namespace WinFormsUI.Game.Combat.Projectiles
                 if (ev.EntityB?.TryGet<GHealth>(out var health) == true)
                 {
                     float armor = ev.EntityB.Get<GPlayer>()?.Stats.Armor ?? 0;
-                    float damage = MathF.Max(0, projectile.Damage - armor);
+                    float damage = MathF.Max(MIN_DAMAGE, projectile.Damage - armor);
                     health.DealDamage(damage);
                 }
                 projectile.Owner.MarkDelete();

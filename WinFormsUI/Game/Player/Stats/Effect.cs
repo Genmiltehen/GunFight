@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Base;
-using XEngine.Core.Utils;
+using XEngine.Core.Common;
 
 namespace WinFormsUI.Game.Player.Stats
 {

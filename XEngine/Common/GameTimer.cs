@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XEngine.Core.Utils
+namespace XEngine.Core.Common
 {
     public class GameTimer
     {
@@ -44,6 +44,12 @@ namespace XEngine.Core.Utils
         {
             Elapsed = 0;
             IsRunning = false;
+            return this;
+        }
+
+        public GameTimer ForceEnd()
+        {
+            Elapsed = Duration;
             return this;
         }
 

@@ -46,7 +46,10 @@ namespace WinFormsUI.Game.Player
             playerEntity.AddComponent<GHealth>()
                 .Init(config.MaxHealth)
                 .SetRegen(config.HealthRegenRate, config.HealthRegenDelay)
-                .SetDeathCallback(e => e.MarkDelete(true));
+                .SetDeathCallback(e => e.MarkDelete(true))
+                .IsRendered = true;
+
+            playerEntity.AddComponent<GHealthRenderer>();
 
             playerEntity.AddComponent<GPlayer>()
                 .Init(config)
@@ -77,5 +80,7 @@ namespace WinFormsUI.Game.Player
             circleSensorDef.filter.maskBits = (ulong)ContactFlags.SOLID;
             B2Shapes.b2CreateCircleShape(bid, circleSensorDef, new(new(0, _r * 0.9f), _r * 0.95f));
         }
+    
+        public IEnumerable<string> GetIds() => configLoader.GetAllIds();
     }
 }

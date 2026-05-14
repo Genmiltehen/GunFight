@@ -1,9 +1,23 @@
 [
 	{
-		"Id": "pistol_bullet",
-		"Damage": 2,
+		"Id": "9mm",
+		"Damage": 8,
 		"Size": 1,
-		"MaxLifetime": 2,
+		"MaxLifetime": 1.5,
+		"TexturePath": "Projectiles\\Bullet.png"
+	},
+	{
+		"Id": "5.56",
+		"Damage": 7.5,
+		"Size": 1,
+		"MaxLifetime": 1.5,
+		"TexturePath": "Projectiles\\Bullet.png"
+	},
+	{
+		"Id": "gauge",
+		"Damage": 5,
+		"Size": 1,
+		"MaxLifetime": 0.2,
 		"TexturePath": "Projectiles\\Bullet.png"
 	}
 ]

@@ -1,39 +1,24 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Desktop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XEngine.Core.Common.Sprite;
 using XEngine.Core.Graphics;
 using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Common.Trace
 {
-    public class TracerRenderModule : RenderModule
+    public class TracerRenderModule(GLProvider provider) : RenderModule(provider)
     {
         public override int Priority => -1;
-        private readonly GLProvider _glProvider;
-        private readonly Shader _line_shader;
-
-        public TracerRenderModule(GLProvider glProvider)
-        {
-            _glProvider = glProvider;
-            _line_shader = _glProvider.GetShader("Line");
-        }
 
         public override void Render(GScene scene)
         {
             if (_screenSize.X <= 0 || _screenSize.Y <= 0) return;
+            var _shader = _provider.GetShader("Line");
 
-            _line_shader.Use();
+            _shader.Use();
 
-            _line_shader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
-            _line_shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
-            var lb = _glProvider.LineBatcher;
+            _shader.SetMatrix4("uProjection", scene.Camera.GetProjectionMatrix(_screenSize));
+            _shader.SetMatrix4("uView", scene.Camera.GetViewMatrix());
+            var lb = _provider.LineBatcher;
             foreach (var (_, tr) in scene.Query<GTrace>())
             {
                 float brightness = 1;
@@ -47,8 +32,8 @@ namespace XEngine.Core.Common.Trace
                 }
             }
 
-            _glProvider.LineBatcher.Draw();
-            _glProvider.LineBatcher.Clear();
+            _provider.LineBatcher.Draw();
+            _provider.LineBatcher.Clear();
             GL.BindVertexArray(0);
         }
     }

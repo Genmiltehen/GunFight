@@ -49,7 +49,6 @@ namespace XEngine.Core
 
             _glProvider.Init();
             _glProvider.LoadShader("Line", "Line");
-            _glProvider.LoadShader("NineSlice", "NineSlice");
 
             SpriteRendererModule spriteRenderer = new(_glProvider);
             NineSliceRendererModule nineslicerenderer = new(_glProvider);

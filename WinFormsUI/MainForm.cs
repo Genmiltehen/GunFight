@@ -1,18 +1,22 @@
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System.Diagnostics;
-using WinFormsUI.Game;
 using WinFormsUI.Game.Input;
+using WinFormsUI.Game.Player;
 using WinFormsUI.Game.Scenes;
 using XEngine.Core;
+using XEngine.Core.Common.Health;
 using XEngine.Core.Common.Trace;
 using XEngine.Core.Graphics.OpenGL;
+using XEngine.Core.Scenery;
 
 namespace WinFormsUI
 {
     public partial class MainForm : Form
     {
         private readonly GameEngine _engine;
+        private MainScene _scene = null!;
 
         private readonly Stopwatch _stopwatch = new();
 
@@ -31,15 +35,54 @@ namespace WinFormsUI
         private void MainFormLoad(object sender, EventArgs e)
         {
             _engine.Renderer.AddRenderModule(new TracerRenderModule(_engine.GLProvider));
-            _engine.Renderer.SetViewport(ClientSize.Width, ClientSize.Height);
+            _engine.Renderer.AddRenderModule(new BasicHealthRenderModule(_engine.GLProvider));
 
-            _engine.SceneManager.SwitchTo(new MainScene(_engine));
+            _engine.GLProvider.LoadShader("Rectangle", "Rectangle");
+            _engine.GLProvider.LoadShader("NineSlice", "NineSlice");
+
+            _engine.Renderer.SetViewport(ClientSize.Width, ClientSize.Height);
+            
+            if (TryGetScene(out _scene)) _engine.SceneManager.SwitchTo(_scene);
 
             _stopwatch.Start();
             MainTimer.Start();
 
             Activate();
             Focus();
+        }
+
+        private void Restart()
+        {
+
+            string message = _scene.WinnerName == ""
+                ? "НИЧЬЯ! Оба игрока погибли одновременно!"
+                : $"ПОБЕДИЛ ИГРОК {_scene.WinnerName}!\n\nПоздравляем победителя!";
+            DialogResult result = MessageBox.Show(message + "\n\nНачать новую игру?", "ИГРА ОКОНЧЕНА",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                _scene = new(_engine, "green", "red", "Levels/Arena1.json");
+                _scene.OnEnd += Restart;
+                _engine.SceneManager.ScheduleEndScene();
+                _engine.SceneManager.ScheduleStartScene(_scene);
+
+            }
+            if (result == DialogResult.No) Environment.Exit(0);
+        }
+
+        private bool TryGetScene(out MainScene scene)
+        {
+            scene = default!;
+            string[] variants = [.. PlayerFactory.Instance.GetIds()];
+            using var form = new MenuForm(variants);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                scene = new(_engine, form.PlayerA, form.PlayerB, "Levels/Arena1.json");
+                scene.OnEnd += Restart;
+                return true;
+            }
+            return false;
         }
 
         private void OnGLLoad(object sender, EventArgs e)
