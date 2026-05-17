@@ -57,15 +57,6 @@ namespace WinFormsUI.Game.Combat.Projectiles
             return e;
         }
 
-        private static void CreatwWeight(B2BodyId bid)
-        {
-            B2ShapeDef weightDef = B2Types.b2DefaultShapeDef();
-            weightDef.density = 1;
-            weightDef.filter.categoryBits = (ulong)ContactFlags.None;
-            weightDef.filter.maskBits = (ulong)ContactFlags.None;
-            b2CreateCircleShape(bid, weightDef, new(new(0, 0), 0.1f));
-        }
-
         private static Action<B2BodyId> CreateCollider(ProjectileConfig config)
         {
             return bid =>
@@ -83,20 +74,19 @@ namespace WinFormsUI.Game.Combat.Projectiles
         private const float MIN_DAMAGE = 0.1f;
         private static void BulletCollisionCallback(ContactWrapper ev)
         {
+            if (!CheckFlag(ev.ShapeIdA, (ulong)ContactFlags.PROJECTILE)) return;
+            if (!ev.IsSensor) return;
+            if (ev.EntityA!.SourceId == ev.EntityB?.Id) return;
 
-            if (ev.IsSensor && CheckFlag(ev.ShapeIdA, (ulong)ContactFlags.PROJECTILE))
+            var projectile = ev.EntityA!.Get<GProjectile>()!;
+            if (ev.EntityB?.TryGet<GHealth>(out var health) == true)
             {
-                if (ev.EntityA!.SourceId == ev.EntityB?.Id) return;
-
-                var projectile = ev.EntityA!.Get<GProjectile>()!;
-                if (ev.EntityB?.TryGet<GHealth>(out var health) == true)
-                {
-                    float armor = ev.EntityB.Get<GPlayer>()?.Stats.Armor ?? 0;
-                    float damage = MathF.Max(MIN_DAMAGE, projectile.Damage - armor);
-                    health.DealDamage(damage);
-                }
-                projectile.Owner.MarkDelete();
+                float armor = ev.EntityB.Get<GPlayer>()?.Stats.Armor ?? 0;
+                float damage = MathF.Max(MIN_DAMAGE, projectile.Damage - armor);
+                health.DealDamage(damage);
             }
+            projectile.Owner.MarkDelete();
+
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XEngine.Core.Base;
+﻿using XEngine.Core.Base;
 using XEngine.Core.Scenery;
 
 namespace WinFormsUI.Game.Player.Stats

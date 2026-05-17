@@ -3,10 +3,8 @@ using WinFormsUI.Game.Box2D;
 using WinFormsUI.Game.Config;
 using WinFormsUI.Game.Player.Components;
 using XEngine.Core.Base;
-using XEngine.Core.Box2DCompat;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common.Health;
-using XEngine.Core.Common.Sprite;
 using XEngine.Core.Scenery;
 using static XEngine.Core.Box2DCompat.B2Helpers;
 

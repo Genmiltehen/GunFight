@@ -1,6 +1,5 @@
 ﻿using Box2D.NET;
 using OpenTK.Mathematics;
-using System.Diagnostics;
 using WinFormsUI.Game.Box2D;
 using WinFormsUI.Game.Combat.Weapons;
 using XEngine.Core.Base;

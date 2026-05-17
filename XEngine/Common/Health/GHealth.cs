@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using XEngine.Core.Base;
-using XEngine.Core.Utils.Maths;
+﻿using XEngine.Core.Base;
+using XEngine.Core.Utils;
 
 namespace XEngine.Core.Common.Health
 {

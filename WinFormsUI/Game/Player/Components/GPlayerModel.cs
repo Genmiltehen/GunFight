@@ -5,7 +5,7 @@ using XEngine.Core.Base;
 using XEngine.Core.Common;
 using XEngine.Core.Common.Sprite;
 using XEngine.Core.Graphics.OpenGL;
-using XEngine.Core.Utils.Maths;
+using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Player.Components
 {
@@ -117,7 +117,7 @@ namespace WinFormsUI.Game.Player.Components
             if (WeaponEntity.TryGet<GSprite>(out var sprite)) sprite.SetTexture(NoneTexture);
         }
 
-        public void UpdatePockets(GPlayerWeaponry weaponry)
+        public void UpdatePockets(GWeaponry weaponry)
         {
             if (PocketLeft.TryGet<GSprite>(out var lSprite))
                 if (weaponry.HeldWeapon is WeaponItem lItme) lSprite

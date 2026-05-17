@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using XEngine.Core.Common.Transform;
+﻿using XEngine.Core.Common.Transform;
 using XEngine.Core.Scenery;
 
 namespace XEngine.Core.Base

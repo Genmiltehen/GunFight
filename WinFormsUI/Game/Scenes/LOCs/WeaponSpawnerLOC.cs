@@ -5,9 +5,6 @@ namespace WinFormsUI.Game.Scenes.LOCs
 {
     internal class WeaponSpawnerLOC : BaseLOC
     {
-        public override Entity Spawn(GScene scene)
-        {
-            return LevelElementsFabctory.CreateWeaponSpawner(scene, Pos);
-        }
+        public override Entity Spawn(GScene scene) => LevelElementsFabctory.CreateWeaponSpawner(scene, Pos);
     }
 }

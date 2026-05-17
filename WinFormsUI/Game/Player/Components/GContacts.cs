@@ -1,11 +1,4 @@
 ﻿using Box2D.NET;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WinFormsUI.Game.Box2D;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat;
@@ -50,10 +43,6 @@ namespace WinFormsUI.Game.Player.Components
 
         public static void ContactParseAdd(ContactWrapper ev)
         {
-            if (ev.EntityA?.TryGet<GContacts>(out var c) == true)
-            {
-                
-            }
             ev.EntityA?.Get<GContacts>()?.AddContacts(ev.ShapeIdB);
             ev.EntityB?.Get<GContacts>()?.AddContacts(ev.ShapeIdA);
         }

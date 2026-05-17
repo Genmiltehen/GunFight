@@ -1,10 +1,9 @@
 ﻿using XEngine.Core.Scenery;
-using static WinFormsUI.Game.Player.Contol.ActionType;
-using static WinFormsUI.Game.Box2D.ContactFlags;
 using Box2D.NET;
 using XEngine.Core.Box2DCompat;
-using System.Diagnostics;
 using WinFormsUI.Game.Drop;
+using static WinFormsUI.Game.Player.Contol.ActionType;
+using static WinFormsUI.Game.Box2D.ContactFlags;
 
 namespace WinFormsUI.Game.Player.PlayerStates
 {
@@ -52,8 +51,6 @@ namespace WinFormsUI.Game.Player.PlayerStates
                     player.Weaponry.Equip(weapon);
                     player.Model.UpdatePockets(player.Weaponry);
                 }
-
-                // TODO: Pick up
             }
 
             float hor = player.Control.HorizotnalInput();

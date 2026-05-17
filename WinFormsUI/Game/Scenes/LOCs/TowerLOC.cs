@@ -7,11 +7,7 @@ namespace WinFormsUI.Game.Scenes.LOCs
 {
     public class TowerLOC : BaseLOC
     {
-        [JsonVector2] public Vector2 Size { get; set; }
-
-        public override Entity Spawn(GScene scene)
-        {
-            return LevelElementsFabctory.CreateTower(scene, Pos, Size, Rotation);
-        }
+        [JsonVector2] public Vector2 Size { get; set; } = Vector2.One;
+        public override Entity Spawn(GScene scene) => LevelElementsFabctory.CreateTower(scene, Pos, Size, Rotation);
     }
 }

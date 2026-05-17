@@ -7,9 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XEngine.Core.Input.InputAxis;
-using XEngine.Core.Utils.Maths;
 
-namespace XEngine.Core.Utils.Maths
+namespace XEngine.Core.Utils
 {
     public static class MathUtils
     {

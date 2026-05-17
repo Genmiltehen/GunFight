@@ -2,7 +2,6 @@
 using XEngine.Core.Base;
 using XEngine.Core.Common.Transform;
 using XEngine.Core.Scenery;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace XEngine.Core.Box2DCompat.Components
 {

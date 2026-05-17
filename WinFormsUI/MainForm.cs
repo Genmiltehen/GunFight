@@ -1,6 +1,5 @@
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using System.Diagnostics;
 using WinFormsUI.Game.Input;
 using WinFormsUI.Game.Player;
@@ -8,8 +7,6 @@ using WinFormsUI.Game.Scenes;
 using XEngine.Core;
 using XEngine.Core.Common.Health;
 using XEngine.Core.Common.Trace;
-using XEngine.Core.Graphics.OpenGL;
-using XEngine.Core.Scenery;
 
 namespace WinFormsUI
 {
@@ -41,7 +38,7 @@ namespace WinFormsUI
             _engine.GLProvider.LoadShader("NineSlice", "NineSlice");
 
             _engine.Renderer.SetViewport(ClientSize.Width, ClientSize.Height);
-            
+
             if (TryGetScene(out _scene)) _engine.SceneManager.SwitchTo(_scene);
 
             _stopwatch.Start();
@@ -60,14 +57,7 @@ namespace WinFormsUI
             DialogResult result = MessageBox.Show(message + "\n\nНачать новую игру?", "ИГРА ОКОНЧЕНА",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            if (result == DialogResult.Yes)
-            {
-                _scene = new(_engine, "green", "red", "Levels/Arena1.json");
-                _scene.OnEnd += Restart;
-                _engine.SceneManager.ScheduleEndScene();
-                _engine.SceneManager.ScheduleStartScene(_scene);
-
-            }
+            if (result == DialogResult.Yes && TryGetScene(out _scene)) _engine.SceneManager.SwitchTo(_scene);
             if (result == DialogResult.No) Environment.Exit(0);
         }
 

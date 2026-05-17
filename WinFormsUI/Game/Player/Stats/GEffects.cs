@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XEngine.Core.Base;
+﻿using XEngine.Core.Base;
 
 namespace WinFormsUI.Game.Player.Stats
 {
@@ -22,13 +16,29 @@ namespace WinFormsUI.Game.Player.Stats
             return this;
         }
 
-        public GEffects Add(Effect effect)
+        public GEffects Add<T>(T effect) where T : Effect
         {
-            Owner.Scene.RegisterTimer(effect.Timer);
-            effect.Timer.Start();
-            _effects.Add(effect);
-            _isDirty = true;
+            if (TryGetEffectOfType<T>(out var _oldEffect)) _oldEffect.Timer.Duration += effect.Timer.Duration;
+            else
+            {
+                Owner.Scene.RegisterTimer(effect.Timer);
+                effect.Timer.Start();
+                _effects.Add(effect);
+                _isDirty = true;
+            }
             return this;
+        }
+
+        private bool TryGetEffectOfType<T>(out T effect) where T : Effect
+        {
+            effect = null!;
+            var effectsOftype = _effects.OfType<T>();
+            if (effectsOftype.Any())
+            {
+                effect = effectsOftype.First();
+                return true;
+            }
+            return false;
         }
 
         public GEffects Remove(Effect effect)
@@ -38,6 +48,8 @@ namespace WinFormsUI.Game.Player.Stats
             _isDirty = true;
             return this;
         }
+
+        
 
         public IPlayerStats GetStats()
         {

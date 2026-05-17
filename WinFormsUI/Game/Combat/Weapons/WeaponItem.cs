@@ -1,12 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text;
-using System.Threading.Tasks;
-using XEngine.Core.Base;
 using XEngine.Core.Common;
 using XEngine.Core.Graphics.OpenGL;
 using XEngine.Core.Scenery;

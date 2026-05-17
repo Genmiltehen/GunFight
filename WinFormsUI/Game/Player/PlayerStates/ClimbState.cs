@@ -1,7 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils.Maths;
-using static XEngine.Core.Utils.Maths.MathUtils;
+using static XEngine.Core.Utils.MathUtils;
 using static WinFormsUI.Game.Box2D.ContactFlags;
 using static WinFormsUI.Game.Player.Contol.ActionType;
 

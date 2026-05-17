@@ -7,11 +7,8 @@ namespace WinFormsUI.Game.Scenes.LOCs
 {
     internal class BoxLOC : BaseLOC
     {
-        [JsonVector2] public Vector2 Size { get; set; }
+        [JsonVector2] public Vector2 Size { get; set; } = Vector2.One;
 
-        public override Entity Spawn(GScene scene)
-        {
-            return LevelElementsFabctory.CreateBox(scene, Pos, Size, Rotation);
-        }
+        public override Entity Spawn(GScene scene) => LevelElementsFabctory.CreateBox(scene, Pos, Size, Rotation);
     }
 }

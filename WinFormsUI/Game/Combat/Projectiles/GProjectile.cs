@@ -4,12 +4,11 @@ namespace WinFormsUI.Game.Combat.Projectiles
 {
     public class GProjectile : GameComponent
     {
-        public string Source { get; set; } = null!;
         public float Damage { get; set; } = 0;
 
-        public GProjectile Init(ProjectileConfig config)
+        public GProjectile Init(float damage)
         {
-            Damage = config.Damage;
+            Damage = damage;
             return this;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using Box2D.NET;
-using System.Diagnostics;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;

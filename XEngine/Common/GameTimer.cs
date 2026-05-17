@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace XEngine.Core.Common
+﻿namespace XEngine.Core.Common
 {
     public class GameTimer
     {

@@ -5,9 +5,6 @@ namespace WinFormsUI.Game.Scenes.LOCs
 {
     internal class EffectSpawnerLOC : BaseLOC
     {
-        public override Entity Spawn(GScene scene)
-        {
-            return LevelElementsFabctory.CreateEffectSpawner(scene, Pos);
-        }
+        public override Entity Spawn(GScene scene) => LevelElementsFabctory.CreateEffectSpawner(scene, Pos);
     }
 }

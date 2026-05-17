@@ -1,6 +1,4 @@
-﻿using Box2D.NET;
-using OpenTK.Mathematics;
-using System.Diagnostics;
+﻿using OpenTK.Mathematics;
 using WinFormsUI.Game.Combat.Projectiles;
 using WinFormsUI.Game.Combat.Weapons;
 using WinFormsUI.Game.Drop;
@@ -13,8 +11,7 @@ using XEngine.Core.Box2DCompat.Components;
 using XEngine.Core.Common;
 using XEngine.Core.Common.Transform;
 using XEngine.Core.Scenery;
-using XEngine.Core.Utils.Maths;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
+using XEngine.Core.Utils;
 
 namespace WinFormsUI.Game.Player
 {
@@ -26,7 +23,7 @@ namespace WinFormsUI.Game.Player
         public readonly GameTimer JumpTimer = new(0.3f);
 
         private IPlayerState? _state = new GroundedState();
-        public GPlayerWeaponry Weaponry { get; private set; } = null!;
+        public GWeaponry Weaponry { get; private set; } = null!;
         public GPlayerModel Model { get; private set; } = null!;
         public GEffects Effects { get; private set; } = null!;
         public GContacts Contacts { get; private set; } = null!;
@@ -38,7 +35,7 @@ namespace WinFormsUI.Game.Player
         {
             Body = Owner.Get<GBox2DBody>()!;
 
-            Weaponry = Owner.AddComponent<GPlayerWeaponry>().Init(config.StartWeaponId);
+            Weaponry = Owner.AddComponent<GWeaponry>().Init(config.StartWeaponId);
 
             Model = Owner.AddComponent<GPlayerModel>().Init(config);
             Model.UpdatePockets(Weaponry);

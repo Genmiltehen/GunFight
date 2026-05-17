@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System.Diagnostics;
 using WinFormsUI.Game.Player;
 using XEngine.Core.Base;
 using XEngine.Core.Common.Transform;

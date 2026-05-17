@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WinFormsUI.Game.Player.Stats
+﻿namespace WinFormsUI.Game.Player.Stats
 {
     public class PlayerStats(PlayerConfig config) : IPlayerStats
     {

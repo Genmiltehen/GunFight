@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.Design.AxImporter;
-
-namespace WinFormsUI
+﻿namespace WinFormsUI
 {
     public partial class MenuForm : Form
     {
@@ -19,10 +8,12 @@ namespace WinFormsUI
 
         public string PlayerA { get; private set; } = "";
         public string PlayerB { get; private set; } = "";
+        private readonly string[] vars;
 
         public MenuForm(string[] variants)
         {
             InitializeComponent();
+            vars = variants;
 
             Text = "Выберите игроков";
             Size = new Size(300, 150);
@@ -36,8 +27,8 @@ namespace WinFormsUI
 
             btnOk = new Button { Text = "OK", Location = new(10, 70), DialogResult = DialogResult.OK };
 
-            cb1.Items.AddRange(variants);
-            cb2.Items.AddRange(variants);
+            cb1.Items.AddRange(vars);
+            cb2.Items.AddRange(vars);
 
             Controls.Add(lbl1);
             Controls.Add(cb1);
@@ -52,8 +43,8 @@ namespace WinFormsUI
         {
             if (DialogResult == DialogResult.OK)
             {
-                PlayerA = cb1.SelectedItem?.ToString() ?? "";
-                PlayerB = cb2.SelectedItem?.ToString() ?? "";
+                PlayerA = cb1.SelectedItem?.ToString() ?? vars[0];
+                PlayerB = cb2.SelectedItem?.ToString() ?? vars[0];
             }
             base.OnFormClosing(e);
         }

@@ -2,7 +2,7 @@
 using OpenTK.Mathematics;
 using XEngine.Core.Base;
 using XEngine.Core.Box2DCompat.Components;
-using XEngine.Core.Utils.Maths;
+using XEngine.Core.Utils;
 
 namespace XEngine.Core.Common.Transform
 {

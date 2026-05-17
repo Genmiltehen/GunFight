@@ -14,12 +14,12 @@
 	{
 		"Id": "red",
 		"Armor": 0,
-		"MaxHealth": 150,
+		"MaxHealth": 50,
 		"HealthRegenRate": 2,
-		"HealthRegenDelay": 0.1,
+		"HealthRegenDelay": 1,
 		"Speed": 5,
-		"Acceleration": 40,
-		"JumpPower": 20,
+		"Acceleration": 30,
+		"JumpPower": 18,
 		"StartWeaponId": "ShotGun",
 		"TextureName": "Red"
 	}

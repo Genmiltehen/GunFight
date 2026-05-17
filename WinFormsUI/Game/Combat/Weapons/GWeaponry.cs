@@ -1,20 +1,13 @@
-﻿using OpenTK.Mathematics;
-using System.Diagnostics;
-using WinFormsUI.Game.Combat.Projectiles;
-using WinFormsUI.Game.Drop;
-using WinFormsUI.Game.Player;
-using XEngine.Core.Base;
-using XEngine.Core.Scenery;
-using XEngine.Core.Utils.Maths;
+﻿using XEngine.Core.Base;
 
 namespace WinFormsUI.Game.Combat.Weapons
 {
-    public class GPlayerWeaponry : GameComponent
+    public class GWeaponry : GameComponent
     {
         public WeaponItem? HeldWeapon { get; private set; } = null;
         public WeaponItem? AuxWeapon { get; private set; } = null;
 
-        public GPlayerWeaponry Init(string StartWeapon)
+        public GWeaponry Init(string StartWeapon)
         {
             if (WeaponFactory.Instance.TryCreateWeapon(StartWeapon, out var w))
             {
